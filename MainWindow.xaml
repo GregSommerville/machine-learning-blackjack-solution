@@ -1,0 +1,178 @@
+﻿<Window x:Class="BlackjackStrategy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Optimal Blackjack Strategy Finder Using a Genetic Algorithm"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        Background="DarkGray"
+        x:Name="_this"
+        FontSize="14">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="Background"
+                    Value="LightGreen" />
+            <Setter Property="Margin"
+                    Value="10" />
+            <Setter Property="Height"
+                    Value="26" />
+            <Setter Property="Width"
+                    Value="100" />
+        </Style>
+        <Style x:Key="HeadingStyle"
+               TargetType="Label">
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="FontSize"
+                    Value="16" />
+            <Setter Property="Foreground"
+                    Value="DarkGreen" />
+            <Setter Property="Margin"
+                    Value="5 0 0 0" />
+        </Style>
+        <Style x:Key="BigHeadingStyle"
+               TargetType="Label">
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="FontSize"
+                    Value="20" />
+            <Setter Property="Foreground"
+                    Value="DarkGreen" />
+            <Setter Property="Margin"
+                    Value="5 0 0 0" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Right" />
+        </Style>
+        <Style x:Key="BigValueStyle"
+               TargetType="Label">
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="FontSize"
+                    Value="20" />
+            <Setter Property="Foreground"
+                    Value="Black" />
+            <Setter Property="Margin"
+                    Value="5 0 0 0" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="Height"
+                    Value="20" />
+            <Setter Property="Width"
+                    Value="30" />
+            <Setter Property="Margin"
+                    Value="0" />
+        </Style>
+    </Window.Resources>
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="960" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border Grid.Column="0"
+                Grid.Row="0"
+                Height="670"
+                BorderThickness="10 10 10 0"
+                Background="LightGray">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Label Content="Genetic Algorithm Settings"
+                       Grid.Column="0"
+                       Grid.Row="0"
+                       Margin="0 0 0 10"
+                       Style="{StaticResource HeadingStyle}" />
+                <xctk:PropertyGrid x:Name="_propGrid"
+                                   Grid.Row="1"
+                                   Padding="0"
+                                   NameColumnWidth="180"
+                                   ShowSearchBox="False"
+                                   ShowSortOptions="False"
+                                   ShowTitle="False"
+                                   ShowAdvancedOptions="False"
+                                   ShowPreview="False"
+                                   ShowSummary="False"
+                                   SelectedObject="{Binding ElementName=_this, Path=EngineParams}"
+                                   Margin="0" />
+                <StackPanel Grid.Row="6"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                    <Button HorizontalAlignment="Left"
+                            x:Name="btnSolve"
+                            Click="btnSolve_Click">Find Solution</Button>
+                </StackPanel>
+                <ScrollViewer Height="280"
+                              Width="255"
+                              Grid.Column="0"
+                              Grid.Row="7"
+                              Margin="0 20 0 0"
+                              HorizontalAlignment="Left">
+                    <TextBlock x:Name="gaResultTB"
+                               VerticalAlignment="Top"
+                               Text="Configure settings,then click on the green Find Solution button to proceed"
+                               Margin="10,0,0,11"
+                               Height="Auto"
+                               TextWrapping="Wrap"
+                               FontSize="12px"
+                               HorizontalAlignment="Left" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+        <Border Grid.Column="1"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                BorderThickness="5 10 10 10"
+                HorizontalAlignment="Left"
+                Background="LightGray">
+            <Grid Margin="0"
+                  Width="950"
+                  Height="660">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border BorderThickness="2"
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Height="640"
+                        Width="925"
+                        Margin="10,10,5,11"
+                        BorderBrush="Black"
+                        Grid.ColumnSpan="2">
+                    <Canvas x:Name="canvas"
+                            Background="AntiqueWhite"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                    </Canvas>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
