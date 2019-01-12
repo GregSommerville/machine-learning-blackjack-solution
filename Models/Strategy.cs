@@ -10,32 +10,30 @@ namespace BlackjackStrategy.Models
     // encapsulates one complete strategy to play Blackjack
     class Strategy
     {
-        private Dictionary<string, ActionToTake> pairsStrategy = new Dictionary<string, ActionToTake>();
-        private Dictionary<string, ActionToTake> softStrategy = new Dictionary<string, ActionToTake>();
-        private Dictionary<string, ActionToTake> hardStrategy = new Dictionary<string, ActionToTake>();
+        private ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
 
-        public Strategy(string candidate)
+        public Strategy()
         {
-            // convert into internal representation
+            // this constructor creates a random representation
         }
 
         //-------------------------------------------------------------------------------------------
 
         public void AddPairStrategy(string pairRank, ActionToTake action, Card dealerUpcard)
         {
-            pairsStrategy[CleanRank(pairRank) + CleanRank(dealerUpcard.Rank)] = action;
+//            pairsStrategy[CleanRank(pairRank) + CleanRank(dealerUpcard.Rank)] = action;
         }
 
         public void AddSoftStrategy(string secondaryCardRank, ActionToTake action, Card dealerUpcard)
         {
             // secondary rank is the non-Ace
-            softStrategy[CleanRank(secondaryCardRank) + CleanRank(dealerUpcard.Rank)] = action;
+  //          softStrategy[CleanRank(secondaryCardRank) + CleanRank(dealerUpcard.Rank)] = action;
         }
 
         public void AddHardStrategy(int handTotal, ActionToTake action, Card dealerUpcard)
         {
             // handTotal goes from 5 (since a total of 4 means a pair of 2s) to 20
-            hardStrategy[handTotal + CleanRank(dealerUpcard.Rank)] = action;
+    //        hardStrategy[handTotal + CleanRank(dealerUpcard.Rank)] = action;
         }
 
         private string CleanRank(string rank)

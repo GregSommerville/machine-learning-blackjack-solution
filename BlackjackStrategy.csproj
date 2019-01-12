@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\CardUtils.cs" />
+    <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\EngineParameters.cs" />
     <Compile Include="Models\Randomizer.cs" />
     <Compile Include="Models\Strategy.cs" />

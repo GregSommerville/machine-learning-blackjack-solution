@@ -7,11 +7,44 @@ namespace BlackjackStrategy.Models
 {
     class Card
     {
-        public string Rank { get; set; }
-        public string Suit { get; set; }
+        // the card attribute enums
+        public enum Suits { Hearts, Spades, Clubs, Diamonds };
+        public enum Ranks { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King };
 
-        public enum Suits {  Hearts, Spades, Clubs, Diamonds};
-        public enum Ranks {  Two = 2, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace};
+        // this card
+        public Ranks Rank { get; set; }
+        public Suits Suit { get; set; }
+
+        public Card(Ranks rankValue, Suits suit)
+        {
+            Rank = rankValue;
+            Suit = suit;
+            var c = Enum.GetValues(typeof(Ranks)).Cast<int>();
+        }
+
+        public static List<Ranks> ListOfRanks
+        {
+            get
+            {
+                var ranks = Enum.GetValues(typeof(Ranks));
+                var result = new List<Ranks>();
+                foreach (var rank in ranks)
+                    result.Add((Ranks)rank);
+                return result;
+            }
+        }
+
+        public static List<Suits> ListOfSuits
+        {
+            get
+            {
+                var suits = Enum.GetValues(typeof(Suits));
+                var result = new List<Suits>();
+                foreach (var suit in suits)
+                    result.Add((Suits)suit);
+                return result;
+            }
+        }
 
         public int RankValueHigh
         {
@@ -19,16 +52,15 @@ namespace BlackjackStrategy.Models
             {
                 switch (Rank)
                 {
-                    case "A":
+                    case Ranks.Ace:
                         return 11;
-                    case "K":
+
+                    case Ranks.King:
+                    case Ranks.Queen:
+                    case Ranks.Jack:
+                    case Ranks.Ten:
                         return 10;
-                    case "Q":
-                        return 10;
-                    case "J":
-                        return 10;
-                    case "T":
-                        return 10;
+
                     default:
                         return Convert.ToInt32(Rank);
                 }
@@ -37,111 +69,34 @@ namespace BlackjackStrategy.Models
 
         public int RankValueLow
         {
-            // For straights where A is treated as below the 2
             get
             {
                 switch (Rank)
                 {
-                    case "A":
+                    case Ranks.Ace:
                         return 1;
-                    case "K":
+
+                    case Ranks.King:
+                    case Ranks.Queen:
+                    case Ranks.Jack:
+                    case Ranks.Ten:
                         return 10;
-                    case "Q":
-                        return 10;
-                    case "J":
-                        return 10;
-                    case "T":
-                        return 10;
+
                     default:
                         return Convert.ToInt32(Rank);
                 }
             }
         }
 
-        public Card(string rank, string suit)
-        {
-            Rank = rank;
-            Suit = suit;
-        }
-
-        public Card(string combined)
-        {
-            Rank = combined[0].ToString();
-            Suit = combined[1].ToString();
-        }
-
-        public Card(int rankValue, string suit)
+        public static string RankText(Ranks rank)
         {
             var rankChars = "  23456789TJQKA".ToCharArray();
-            Rank = rankChars[rankValue].ToString();
-            Suit = suit;
-        }
-
-        public Card(Ranks rankValue, string suit)
-        {
-            var rankChars = "  23456789TJQKA".ToCharArray();
-            Rank = rankChars[(int)rankValue].ToString();
-            Suit = suit;
-        }
-
-        public Card(Ranks rankValue, Suits suit)
-        {
-            var rankChars = "  23456789TJQKA".ToCharArray();
-            var suitChars = "HSCD";
-            Rank = rankChars[(int)rankValue].ToString();
-            Suit = suitChars[(int)suit].ToString();
-        }
-
-        public static string RankText(int rank)
-        {
-            var rankChars = "  23456789TJQKA".ToCharArray();
-            return rankChars[rank].ToString();
-        }
-
-        public static string RankDescription(int rank, bool pluralForm = true)
-        {
-            string suffix = "";
-            if (pluralForm)
-            {
-                suffix = "s";
-                if (rank == 6) suffix = "es";
-            }
-
-            switch (rank)
-            {
-                case 14:
-                    return "Ace" + suffix;
-                case 13:
-                    return "King" + suffix;
-                case 12:
-                    return "Queen" + suffix;
-                case 11:
-                    return "Jack" + suffix;
-                case 10:
-                    return "Ten" + suffix;
-                case 9:
-                    return "Nine" + suffix;
-                case 8:
-                    return "Eight" + suffix;
-                case 7:
-                    return "Seven" + suffix;
-                case 6:
-                    return "Six" + suffix;
-                case 5:
-                    return "Five" + suffix;
-                case 4:
-                    return "Four" + suffix;
-                case 3:
-                    return "Three" + suffix;
-                case 2:
-                    return "Two" + suffix;
-            }
-            return "";
+            return rankChars[Convert.ToInt32(rank)].ToString();
         }
 
         public override string ToString()
         {
-            return Rank + Suit;
+            return RankText(Rank) + Suit;
         }
     }
 
@@ -149,12 +104,12 @@ namespace BlackjackStrategy.Models
 
     class Hand
     {
+        public List<Card> Cards { get; set; }
+
         public Hand()
         {
             Cards = new List<Card>();
         }
-
-        public List<Card> Cards { get; set; }
 
         public void AddCard(Card card)
         {
@@ -180,7 +135,7 @@ namespace BlackjackStrategy.Models
         public bool HasSoftAce()
         {
             // first, we need to have an ace
-            if (!Cards.Any(c => c.Rank == "A")) return false;
+            if (!Cards.Any(c => c.Rank == Card.Ranks.Ace)) return false;
 
             // and if it counts as 11 and we have a valid hand, then we have a soft ace
             int highTotal = Cards.Sum(c => c.RankValueHigh);
@@ -194,7 +149,7 @@ namespace BlackjackStrategy.Models
             bool aceWasUsedAsHigh = false;
             foreach (var card in Cards)
             {
-                if (card.Rank == "A")
+                if (card.Rank == Card.Ranks.Ace)
                 {
                     if (!aceWasUsedAsHigh)
                     {
@@ -252,7 +207,7 @@ namespace BlackjackStrategy.Models
             return Cards[currentCard++];
         }
 
-        internal Card DealNextOfRank(string rank)
+        internal Card DealNextOfRank(Card.Ranks rank)
         {
             int index = currentCard;
             while (Cards[index].Rank != rank) index++;
@@ -261,20 +216,13 @@ namespace BlackjackStrategy.Models
             return card;
         }
 
-        internal Card DealNextNotOfRank(string rank)
+        internal Card DealNextNotOfRank(Card.Ranks rank)
         {
             int index = currentCard;
             while (Cards[index].Rank == rank) index++;
             var card = Cards[index];
             Cards.Remove(card);
             return card;
-        }
-
-        internal void RemoveCard(string rank, string suit)
-        {
-            if (rank == "10") rank = "T";
-            var foundCard = Cards.First(c => c.Rank == rank && c.Suit == suit);
-            Cards.Remove(foundCard);
         }
 
         public int CardsRemaining {
@@ -300,8 +248,8 @@ namespace BlackjackStrategy.Models
         {
             // initially populate
             List<Card> deck = new List<Card>(52);
-            foreach (Card.Ranks rank in Enum.GetValues(typeof(Card.Ranks)))
-                foreach (Card.Suits suit in Enum.GetValues(typeof(Card.Suits)))
+            foreach (var rank in Card.ListOfRanks)
+                foreach (var suit in Card.ListOfSuits)
                 {
                     var card = new Card(rank, suit);
                     deck.Add(card);
@@ -326,18 +274,19 @@ namespace BlackjackStrategy.Models
             if (numCards == 52)
                 return GetRandomDeck();
 
-            string suits = "HSCD";
-            string ranks = "23456789TJQKA";
+            var suits = Card.ListOfSuits;
+            var ranks = Card.ListOfRanks;
 
             List<Card> cards = new List<Card>(numCards);
-            string suit, rank;
+            Card.Suits suit;
+            Card.Ranks rank;
             while (cards.Count < numCards)
             {
                 // Generate a card and make sure we don't already have it 
                 do
                 {
-                    suit = suits[Randomizer.IntLessThan(4)].ToString();
-                    rank = ranks[Randomizer.IntLessThan(13)].ToString();
+                    suit = suits[Randomizer.IntLessThan(4)];
+                    rank = ranks[Randomizer.IntLessThan(13)];
                 } while (cards.Any(c => c.Rank == rank && c.Suit == suit));
 
                 cards.Add(new Card(rank, suit));
@@ -345,6 +294,4 @@ namespace BlackjackStrategy.Models
             return cards;
         }
     }
-
-    //=======================================================================
 }
