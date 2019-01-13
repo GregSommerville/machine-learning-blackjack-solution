@@ -90,9 +90,11 @@
     <Compile Include="Models\CardUtils.cs" />
     <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\EngineParameters.cs" />
+    <Compile Include="Models\EngineProgress.cs" />
     <Compile Include="Models\Randomizer.cs" />
     <Compile Include="Models\Strategy.cs" />
     <Compile Include="Models\StrategyTester.cs" />
+    <Compile Include="Models\StrategyView.cs" />
     <Compile Include="Models\TestConditions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

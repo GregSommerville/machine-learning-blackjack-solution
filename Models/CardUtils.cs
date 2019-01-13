@@ -9,7 +9,7 @@ namespace BlackjackStrategy.Models
     {
         // the card attribute enums
         public enum Suits { Hearts, Spades, Clubs, Diamonds };
-        public enum Ranks { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King };
+        public enum Ranks { Two = 2, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace };
 
         // this card
         public Ranks Rank { get; set; }
@@ -19,7 +19,12 @@ namespace BlackjackStrategy.Models
         {
             Rank = rankValue;
             Suit = suit;
-            var c = Enum.GetValues(typeof(Ranks)).Cast<int>();
+        }
+
+        public Card(int rankValue, Suits suit)
+        {
+            Rank = (Ranks) rankValue;
+            Suit = suit;
         }
 
         public static List<Ranks> ListOfRanks
