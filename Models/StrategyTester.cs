@@ -16,8 +16,6 @@ namespace BlackjackStrategy.Models
 
     class StrategyTester
     {
-        public string DealerUpcardRank { get; set; } = "";
-
         private Strategy strategy;
         
         public StrategyTester(Strategy strategy)
@@ -36,12 +34,7 @@ namespace BlackjackStrategy.Models
                 Hand dealerHand = new Hand();
                 Hand playerHand = new Hand();
 
-                if (DealerUpcardRank != "")
-                {
-                    dealerHand.AddCard(deck.DealNextOfRank(DealerUpcardRank));
-                }
-                else
-                    dealerHand.AddCard(deck.DealCard());
+                dealerHand.AddCard(deck.DealCard());
                 dealerHand.AddCard(deck.DealCard());
 
                 playerHand.AddCard(deck.DealCard());

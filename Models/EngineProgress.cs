@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlackjackStrategy.Models
 {
@@ -12,6 +8,5 @@ namespace BlackjackStrategy.Models
         public float BestFitnessThisGen { get; set; }
         public float AvgFitnessThisGen { get; set; }
         public float BestFitnessSoFar { get; set; }
-        public TimeSpan TimeForGeneration { get; set; }
     }
 }

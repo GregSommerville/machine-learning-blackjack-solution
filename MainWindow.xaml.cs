@@ -38,7 +38,7 @@ namespace BlackjackStrategy
             progressSoFar = new List<string>();
 
             // instantiate the engine with params, then set the callbacks for per-generation and for candidate evaluation
-            var engine = new Engine<Strategy>(EngineParams);
+            var engine = new Engine(EngineParams);
             engine.ProgressCallback = PerGenerationCallback;
             engine.FitnessFunction = EvaluateCandidate;
 
