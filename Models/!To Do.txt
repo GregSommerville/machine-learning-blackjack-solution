@@ -1,7 +1,10 @@
 ﻿==========================
 TO DO
 ==========================
+- subclass the strategy
+
 - UI cleanup:
+	add button to display and test hand-coded strategy
 	handle resize of main window.  
 	fix scrolling region for status messages (it extends beyond the visible), 
 	disable button when calculating

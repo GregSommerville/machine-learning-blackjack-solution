@@ -29,6 +29,10 @@ namespace BlackjackStrategy
         {
             gaResultTB.Text = "Creating solution, please wait...";
 
+            //var comparisonStrategy = new HandCodedStrategy();
+            //comparisonStrategy.LoadStandardStrategy();
+
+
             // Finding the solution takes a while, so kick off a thread for it
             Task.Factory.StartNew(() => AsyncCall());
         }
