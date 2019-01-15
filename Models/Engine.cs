@@ -11,6 +11,7 @@ namespace BlackjackStrategy.Models
         public Func<Strategy, float> FitnessFunction { get; set; }
         public Func<EngineProgress, bool> ProgressCallback { get; set; }
         public Strategy BestSolution { get; set; }
+        public int NumGenerationsNeeded { get; set; }
 
         private EngineParameters currentEngineParams = new EngineParameters();  // with defaults
         private List<Strategy> currentGeneration = new List<Strategy>();
@@ -23,6 +24,7 @@ namespace BlackjackStrategy.Models
 
         public Strategy FindBestSolution()
         {
+            // this code assumes that a "best" fitness is one with the highest fitness score
             float bestFitnessScoreAllTime = float.MinValue;
             float bestAverageFitnessScore = float.MinValue;
             int bestSolutionGenerationNumber = 0, bestAverageFitnessGenerationNumber = 0;

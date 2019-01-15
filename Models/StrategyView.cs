@@ -145,6 +145,10 @@ namespace BlackjackStrategy.Models
 
                 foreach (var pairedRank in Card.ListOfRanks)
                 {
+                    // strategy for 10, J, Q, and K are the same, so skip some of those 
+                    if (pairedRank == Card.Ranks.Jack || pairedRank == Card.Ranks.Queen || pairedRank == Card.Ranks.King)
+                        continue;
+
                     // add a white box with the player hand: "x-x"
                     string pairedCardRank = Card.RankText(pairedRank);
                     AddColorBox(Colors.White, pairedCardRank + "-" + pairedCardRank, leftColumnForAces, y, canvas);

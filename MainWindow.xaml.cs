@@ -1,6 +1,7 @@
 ﻿using BlackjackStrategy.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -62,8 +63,7 @@ namespace BlackjackStrategy
                     scoreResults += score + "\n";
                 }
                 scoreResults += "\nAverage score: " + (totalScore / TestConditions.NumFinalTests).ToString("0");
-
-                gaResultTB.Text = "Solution found.\nScores:\n" + scoreResults;
+                gaResultTB.Text = "Solution found in " + totalGenerations + " gens\n\nTest Scores:\n" + scoreResults;
             }),
             DispatcherPriority.Background);
         }
@@ -73,7 +73,7 @@ namespace BlackjackStrategy
         //-------------------------------------------------------------------------
         private float EvaluateCandidate(Strategy candidate)
         {
-            // then test that strategy and return the total money lost/made
+            // test the strategy and return the total money lost/made
             var strategyTester = new StrategyTester(candidate);
             return strategyTester.GetStrategyScore(TestConditions.NumHandsToPlay);
         }
@@ -83,10 +83,32 @@ namespace BlackjackStrategy
         //-------------------------------------------------------------------------
         private bool PerGenerationCallback(EngineProgress progress)
         {
-            string summary = "Generation " + progress.GenerationNumber +
+            string summary = 
+                "Gen " + progress.GenerationNumber +
                 " best: " + progress.BestFitnessThisGen.ToString("0") +
                 " avg: " + progress.AvgFitnessThisGen.ToString("0");
             DisplayCurrentStatus(summary);
+
+            // all settings in one column
+            string settings =
+                "P: " + EngineParams.PopulationSize + " " +
+                "G: " + EngineParams.MinGenerations + " - " + EngineParams.MaxGenerations + " " +
+                "Stgn: " + EngineParams.MaxStagnantGenerations + " " +
+                "Sel: " + EngineParams.SelectionStyle + " " +
+                "Trny: " + EngineParams.TourneySize + " " +
+                "Cross: " + EngineParams.CrossoverRate + " " +
+                "Mut: " + EngineParams.MutationRate + " " +
+                "Elit: " + EngineParams.ElitismRate + " ";
+
+            // save stats: date, gen#, best-this-gen, avg-this-gen, settings
+            var writer = File.AppendText("per-gen-stats.csv");
+            writer.WriteLine(
+                "\"" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "\"," +
+                progress.GenerationNumber + "," +
+                progress.BestFitnessThisGen.ToString("0") + "," +
+                progress.AvgFitnessThisGen.ToString("0") + "," + 
+                settings);
+            writer.Close();
 
             // keep track of how many gens we've searched
             totalGenerations = progress.GenerationNumber;

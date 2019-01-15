@@ -1,9 +1,7 @@
 ﻿==========================
 TO DO
 ==========================
-- run profiler to optimize speed
 - UI cleanup:
 	handle resize of main window.  
 	fix scrolling region for status messages (it extends beyond the visible), 
-	handle movement of vertical splitter between controls and results
-- write stats per generation into CSV file.  columns: generation #, best, avg.  First line of file should be summary of settings and date/time.
+	disable button when calculating

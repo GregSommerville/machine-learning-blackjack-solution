@@ -30,7 +30,7 @@ namespace BlackjackStrategy.Models
         public static List<Ranks> ListOfRanks
         {
             get
-            {
+            {                
                 var ranks = Enum.GetValues(typeof(Ranks));
                 var result = new List<Ranks>();
                 foreach (var rank in ranks)
