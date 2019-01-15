@@ -10,12 +10,7 @@ namespace BlackjackStrategy.Models
     // encapsulates one complete strategy to play Blackjack
     class Strategy
     {
-        public float Fitness { get; set; } = 0;
-
-        // we store the strategies as three multidimensional arrays, where a few spots in each array won't be used.
-        // this is quicker than adjusting the index for each reference, like this: pairsStrategy[currentUpcardRank - baseRank, currentPairRank - baseRank]
         public static int HighestUpcardRank = (int)Card.Ranks.Ace;
-
         public static int HighestPairRank = (int)Card.Ranks.Ace;
 
         // soft remainders go from 2 to 9, since A-10 is blackjack, and A-1 isn't possible (would be A-A)
@@ -26,10 +21,11 @@ namespace BlackjackStrategy.Models
         public static int LowestHardHandValue = 5;
         public static int HighestHardHandValue = 20;
 
-        private ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
+        public float Fitness { get; set; } = 0;
+
+        private readonly ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
         private const int numActionsNoSplit = 3; // Stand, Hit, Double
         private const int numActionsWithSplit = 4;  // Stand, Hit, Double, Split
-
 
         public Strategy()
         {
@@ -72,28 +68,39 @@ namespace BlackjackStrategy.Models
 
         public void Mutate()
         {
-            // if selected to mutate, randomly set one of each of the arrays
+            // randomly set one cell in each of the arrays
 
             // first the pair mutation
-            var upcardRank = Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
-            var randomPairRank = Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
+            var upcardRank = GetRandomRankForMutation();
+            var randomPairRank = GetRandomRankForMutation();
             pairsStrategy[upcardRank, randomPairRank] = (ActionToTake)Randomizer.IntLessThan(numActionsWithSplit);
 
             // then soft card mutation
-            upcardRank = Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
+            upcardRank = GetRandomRankForMutation();
             var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
             softStrategy[upcardRank, randomRemainder] = (ActionToTake)Randomizer.IntLessThan(numActionsNoSplit);
 
             // now hard hand
-            upcardRank = Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
+            upcardRank = GetRandomRankForMutation();
             var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
             hardStrategy[upcardRank, hardTotal] = (ActionToTake)Randomizer.IntLessThan(numActionsNoSplit);
         }
 
+        private int GetRandomRankForMutation()
+        {
+            int rank;
+            do
+                rank = Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
+            while (rank == (int)Card.Ranks.King || 
+                   rank == (int)Card.Ranks.Queen || 
+                   rank == (int)Card.Ranks.Jack);
+            return rank;
+        }
+
         public Strategy CrossOverWith(Strategy otherParent)
         {
-            // here we create one child, with genetic information from each parent in proportion to their
-            // relative fitness scores
+            // here we create one child, with genetic information from each parent 
+            // in proportion to their relative fitness scores
             float myScore = this.Fitness;
             float theirScore = otherParent.Fitness;
             float percentageChanceOfMine = 0;
@@ -135,7 +142,8 @@ namespace BlackjackStrategy.Models
                 foreach (var pairRank in Card.ListOfRanks)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
-                    child.SetActionForPair(upcardRank, pairRank, useMyAction ?
+                    child.SetActionForPair(upcardRank, pairRank, 
+                        useMyAction ?
                             this.GetActionForPair(upcardRank, pairRank) :
                             otherParent.GetActionForPair(upcardRank, pairRank));
                 }
@@ -144,7 +152,8 @@ namespace BlackjackStrategy.Models
                 for (int softRemainder = 2; softRemainder <= HighestSoftHandRemainder; softRemainder++)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
-                    child.SetActionForSoftHand(upcardRank, softRemainder, useMyAction ?
+                    child.SetActionForSoftHand(upcardRank, softRemainder, 
+                        useMyAction ?
                         this.GetActionForSoftHand(upcardRank, softRemainder) :
                         otherParent.GetActionForSoftHand(upcardRank, softRemainder));
                 }
@@ -153,7 +162,8 @@ namespace BlackjackStrategy.Models
                 for (int hardValue = 5; hardValue <= HighestHardHandValue; hardValue++)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
-                    child.SetActionForHardHand(upcardRank, hardValue, useMyAction ?
+                    child.SetActionForHardHand(upcardRank, hardValue, 
+                        useMyAction ?
                         this.GetActionForHardHand(upcardRank, hardValue) :
                         otherParent.GetActionForHardHand(upcardRank, hardValue));
                 }
@@ -190,23 +200,17 @@ namespace BlackjackStrategy.Models
             hardStrategy[(int)upcardRank, hardTotal] = action;
         }
 
-
         // the final result which we use when testing
         public ActionToTake GetActionForHand(Hand hand, Card dealerUpcard)
         {
             if (hand.HandValue() >= 21) return ActionToTake.Stand;
-
-            // we collapse certain ranks together
-            var upcardRank = dealerUpcard.Rank;
-            if (upcardRank == Card.Ranks.Jack || upcardRank == Card.Ranks.Queen || upcardRank == Card.Ranks.King)
-                upcardRank = Card.Ranks.Ten;
+            
+            var upcardRank = CollapsedRank(dealerUpcard.Rank);
 
             if (hand.IsPair())
             {
-                var pairRank = hand.Cards[0].Rank;
-                if (pairRank == Card.Ranks.Jack || pairRank == Card.Ranks.Queen || pairRank == Card.Ranks.King)
-                    pairRank = Card.Ranks.Ten;
-                return pairsStrategy[(int)upcardRank, (int)pairRank];
+                var pairRank = CollapsedRank(hand.Cards[0].Rank);
+                return pairsStrategy[upcardRank, pairRank];
             }
 
             if (hand.HasSoftAce())
@@ -218,10 +222,23 @@ namespace BlackjackStrategy.Models
                     .Sum(c => c.RankValueHigh) + 
                     (howManyAces - 1);
 
-                return softStrategy[(int)upcardRank, total];
+                return softStrategy[upcardRank, total];
             }
 
-            return hardStrategy[(int)upcardRank, hand.HandValue()];
+            return hardStrategy[upcardRank, hand.HandValue()];
+        }
+
+        private int CollapsedRank(Card.Ranks rank)
+        {
+            // we collapse certain ranks together because they're the same value
+            switch (rank)
+            {
+                case Card.Ranks.Jack:
+                case Card.Ranks.Queen:
+                case Card.Ranks.King:
+                    return (int)Card.Ranks.Ten;                
+            }
+            return (int)rank;
         }
     }
 }

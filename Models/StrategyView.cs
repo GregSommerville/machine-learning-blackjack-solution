@@ -143,7 +143,7 @@ namespace BlackjackStrategy.Models
                 AddColorBox(Colors.White, upcardRankName, x, 0, canvas);
                 y = startY;
 
-                foreach (var pairedRank in Card.ListOfRanks)
+                for (var pairedRank = Card.Ranks.Ace; pairedRank >= Card.Ranks.Two; pairedRank--)
                 {
                     // strategy for 10, J, Q, and K are the same, so skip some of those 
                     if (pairedRank == Card.Ranks.Jack || pairedRank == Card.Ranks.Queen || pairedRank == Card.Ranks.King)
