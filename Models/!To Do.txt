@@ -2,6 +2,7 @@
 TO DO
 ==========================
 - subclass the strategy
+- odds of pocket pair = 6%, so need more thorough coverage during testing
 
 - UI cleanup:
 	add button to display and test hand-coded strategy

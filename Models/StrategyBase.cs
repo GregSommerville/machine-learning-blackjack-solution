@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace BlackjackStrategy.Models
 {
+    // enums and other public constants
+    public enum ActionToTake { Stand, Hit, Double, Split };
+
     abstract class StrategyBase
     {
+        public static int NumActionsNoSplit = 3;
+        public static int NumActionsWithSplit = 4;
+
         public static int HighestUpcardRank = (int)Card.Ranks.Ace;
         public static int HighestPairRank = (int)Card.Ranks.Ace;
 
@@ -19,7 +25,7 @@ namespace BlackjackStrategy.Models
         public static int LowestHardHandValue = 5;
         public static int HighestHardHandValue = 20;
 
-        private readonly ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
+        private ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
 
         public StrategyBase()
         {
@@ -28,6 +34,42 @@ namespace BlackjackStrategy.Models
             softStrategy = new ActionToTake[HighestUpcardRank + 1, HighestSoftHandRemainder + 1];
             hardStrategy = new ActionToTake[HighestUpcardRank + 1, HighestHardHandValue + 1];
         }
+
+        public void DeepCopy(StrategyBase copyFrom)
+        {
+            pairsStrategy = (ActionToTake[,])copyFrom.pairsStrategy.Clone();
+            softStrategy = (ActionToTake[,])copyFrom.softStrategy.Clone();
+            hardStrategy = (ActionToTake[,])copyFrom.hardStrategy.Clone();
+        }
+
+        // getters and setters for the three tables, used during crossover
+        public ActionToTake GetActionForPair(Card.Ranks upcardRank, Card.Ranks pairRank)
+        {
+            return pairsStrategy[(int)upcardRank, (int)pairRank];
+        }
+        public void SetActionForPair(Card.Ranks upcardRank, Card.Ranks pairRank, ActionToTake action)
+        {
+            pairsStrategy[(int)upcardRank, (int)pairRank] = action;
+        }
+
+        public ActionToTake GetActionForSoftHand(Card.Ranks upcardRank, int softRemainder)
+        {
+            return softStrategy[(int)upcardRank, softRemainder];
+        }
+        public void SetActionForSoftHand(Card.Ranks upcardRank, int softRemainder, ActionToTake action)
+        {
+            softStrategy[(int)upcardRank, softRemainder] = action;
+        }
+
+        public ActionToTake GetActionForHardHand(Card.Ranks upcardRank, int hardTotal)
+        {
+            return hardStrategy[(int)upcardRank, hardTotal];
+        }
+        public void SetActionForHardHand(Card.Ranks upcardRank, int hardTotal, ActionToTake action)
+        {
+            hardStrategy[(int)upcardRank, hardTotal] = action;
+        }
+
 
         // the final result which we use when testing
         public ActionToTake GetActionForHand(Hand hand, Card dealerUpcard)
@@ -69,7 +111,5 @@ namespace BlackjackStrategy.Models
             }
             return (int)rank;
         }
-
-
     }
 }
