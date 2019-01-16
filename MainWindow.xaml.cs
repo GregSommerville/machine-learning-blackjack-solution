@@ -17,7 +17,7 @@ namespace BlackjackStrategy
         public EngineParameters EngineParams { get; set; } = new EngineParameters();
 
         // each callback adds a progress string here 
-        private List<string> progressSoFar = new List<string>();
+        private List<string> progressMsg = new List<string>();
         private int totalGenerations;
 
         public MainWindow()
@@ -39,8 +39,7 @@ namespace BlackjackStrategy
 
         private void AsyncCall()
         {
-            // reset the progress messages
-            progressSoFar = new List<string>();
+            progressMsg = new List<string>();
 
             // instantiate the engine with params, then set the callbacks for per-generation and for candidate evaluation
             var engine = new Engine(EngineParams);
@@ -124,8 +123,8 @@ namespace BlackjackStrategy
 
         private void DisplayCurrentStatus(string status)
         {
-            progressSoFar.Insert(0, status);
-            string allStatuses = String.Join("\n", progressSoFar);
+            progressMsg.Insert(0, status);
+            string allStatuses = String.Join("\n", progressMsg);
 
             Dispatcher.BeginInvoke(new Action(() =>
             {

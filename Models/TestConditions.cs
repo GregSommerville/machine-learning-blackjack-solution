@@ -3,7 +3,7 @@
     class TestConditions
     {
         public const int NumDecks = 4;
-        public const int NumHandsToPlay = 5000;
+        public const int NumHandsToPlay = 50000;
         public const int BetSize = 2;
         public const int BlackjackPayoffSize = 3;   // if you have a blackjack, most casinos pay off 3:2
 

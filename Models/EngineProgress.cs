@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BlackjackStrategy.Models
+﻿namespace BlackjackStrategy.Models
 {
     class EngineProgress
     {
