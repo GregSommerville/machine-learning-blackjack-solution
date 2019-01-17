@@ -1,6 +1,7 @@
 ﻿using BlackjackStrategy.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -86,11 +87,13 @@ namespace BlackjackStrategy
         //-------------------------------------------------------------------------
         private bool PerGenerationCallback(EngineProgress progress)
         {
-            string summary = 
+            string summary =
                 "Gen " + progress.GenerationNumber +
                 " best: " + progress.BestFitnessThisGen.ToString("0") +
                 " avg: " + progress.AvgFitnessThisGen.ToString("0");
             DisplayCurrentStatus(summary);
+
+            Debug.WriteLine("Generation " + progress.GenerationNumber + " took " + progress.TimeForGeneration.TotalSeconds + " s");
 
             // all settings in one column
             string settings =

@@ -1,9 +1,8 @@
 ﻿==========================
 TO DO
 ==========================
-- need more thorough coverage during testing:
-	- odds of pocket pair = 6%
-	- odds of at least one Ace = 14%
+- deal out the deck and shuffle whenever it gets close to the bottom.
+	this will improve performance greatly during testing, since it's waiting for the randomizer singleton a lot
 
 - UI cleanup:
 	add button to display and test hand-coded strategy

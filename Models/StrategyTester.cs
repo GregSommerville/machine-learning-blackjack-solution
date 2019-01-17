@@ -123,7 +123,8 @@ namespace BlackjackStrategy.Models
                                 newHand.AddCard(deck.DealCard());
                                 playerHands.Add(newHand);
 
-                                Debug.Assert(playerHands.Count < 5, "Too many hands");
+                                // 16 because there are 4 of each rank * 4 decks = 16 possible hands if you split all of the Aces, for example
+                                Debug.Assert(playerHands.Count < 16, "Too many hands");
 
                                 // our extra bet
                                 playerChips -= TestConditions.BetSize;  // no need to adjust totalBetAmount 

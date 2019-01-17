@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -46,9 +47,12 @@ namespace BlackjackStrategy.Models
             }
 
             // loop over generations
+            Stopwatch stopwatch = new Stopwatch();
             int currentGenerationNumber = 0;
             while (true)
             {
+                stopwatch.Restart();
+
                 // for each candidate, find and store the fitness score
                 // multithread the fitness evaluation 
                 Parallel.ForEach(currentGeneration, (candidate) =>
@@ -98,7 +102,8 @@ namespace BlackjackStrategy.Models
                     GenerationNumber = currentGenerationNumber,
                     AvgFitnessThisGen = averageFitness,
                     BestFitnessThisGen = bestFitnessScoreThisGeneration,
-                    BestFitnessSoFar = bestFitnessScoreAllTime
+                    BestFitnessSoFar = bestFitnessScoreAllTime,
+                    TimeForGeneration = stopwatch.Elapsed
                 };
                 bool keepGoing = ProgressCallback(progress);
                 if (!keepGoing) break;  // user signalled to end looping

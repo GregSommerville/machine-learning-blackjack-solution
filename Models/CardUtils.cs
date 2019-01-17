@@ -15,6 +15,9 @@ namespace BlackjackStrategy.Models
         public Ranks Rank { get; set; }
         public Suits Suit { get; set; }
 
+        private static List<Ranks> rankList;
+        private static List<Suits> suitList;
+
         public Card(Ranks rankValue, Suits suit)
         {
             Rank = rankValue;
@@ -30,11 +33,14 @@ namespace BlackjackStrategy.Models
         public static List<Ranks> ListOfRanks
         {
             get
-            {                
+            {
+                if (rankList != null) return rankList;
+
                 var ranks = Enum.GetValues(typeof(Ranks));
                 var result = new List<Ranks>();
                 foreach (var rank in ranks)
                     result.Add((Ranks)rank);
+                rankList = result;
                 return result;
             }
         }
@@ -43,10 +49,13 @@ namespace BlackjackStrategy.Models
         {
             get
             {
+                if (suitList != null) return suitList;
+
                 var suits = Enum.GetValues(typeof(Suits));
                 var result = new List<Suits>();
                 foreach (var suit in suits)
                     result.Add((Suits)suit);
+                suitList = result;
                 return result;
             }
         }
@@ -196,11 +205,7 @@ namespace BlackjackStrategy.Models
 
         public MultiDeck(int numDecks)
         {
-            Cards = new List<Card>();
-            for (int deckNum = 0; deckNum < numDecks; deckNum++)
-            {
-                Cards.AddRange(CardUtils.GetRandomDeck());
-            }
+            Cards = CardUtils.GetRandomDeck(numDecks);
         }
 
         public Card DealCard()
@@ -249,19 +254,22 @@ namespace BlackjackStrategy.Models
 
     class CardUtils
     {
-        static public List<Card> GetRandomDeck()
+        static public List<Card> GetRandomDeck(int numDecks)
         {
             // initially populate
-            List<Card> deck = new List<Card>(52);
-            foreach (var rank in Card.ListOfRanks)
-                foreach (var suit in Card.ListOfSuits)
-                {
-                    var card = new Card(rank, suit);
-                    deck.Add(card);
-                }
+            List<Card> deck = new List<Card>(52 * numDecks);
+
+            for (int i = 0; i < numDecks; i++)
+                foreach (var rank in Card.ListOfRanks)
+                    foreach (var suit in Card.ListOfSuits)
+                    {
+                        var card = new Card(rank, suit);
+                        deck.Add(card);
+                    }
 
             // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
-            for (int i = 51; i > 1; i--)
+            int start = deck.Count - 1;
+            for (int i = start; i > 1; i--)
             {
                 int swapWith = Randomizer.IntLessThan(i);
 
@@ -271,32 +279,6 @@ namespace BlackjackStrategy.Models
             }
 
             return deck;
-        }
-
-        static public List<Card> GetRandomCards(int numCards)
-        {
-            // optimized way of getting a full deck
-            if (numCards == 52)
-                return GetRandomDeck();
-
-            var suits = Card.ListOfSuits;
-            var ranks = Card.ListOfRanks;
-
-            List<Card> cards = new List<Card>(numCards);
-            Card.Suits suit;
-            Card.Ranks rank;
-            while (cards.Count < numCards)
-            {
-                // Generate a card and make sure we don't already have it 
-                do
-                {
-                    suit = suits[Randomizer.IntLessThan(4)];
-                    rank = ranks[Randomizer.IntLessThan(13)];
-                } while (cards.Any(c => c.Rank == rank && c.Suit == suit));
-
-                cards.Add(new Card(rank, suit));
-            }
-            return cards;
         }
     }
 }

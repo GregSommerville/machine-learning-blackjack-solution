@@ -4,7 +4,7 @@
 
     public sealed class EngineParameters
     {
-        public int? PopulationSize { get; set; } = 150;
+        public int? PopulationSize { get; set; } = 200;
         public int? TourneySize { get; set; } = 5;
         public int? MinGenerations { get; set; } = 25;
         public int? MaxGenerations { get; set; } = 250;
