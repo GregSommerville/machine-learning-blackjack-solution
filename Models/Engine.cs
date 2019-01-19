@@ -9,7 +9,7 @@ namespace BlackjackStrategy.Models
     class Engine
     {
         public Func<Strategy, float> FitnessFunction { get; set; }
-        public Func<EngineProgress, bool> ProgressCallback { get; set; }
+        public Func<EngineProgress, Strategy, bool> ProgressCallback { get; set; }
         public Strategy BestSolution { get; set; }
         public int NumGenerationsNeeded { get; set; }
 
@@ -105,7 +105,7 @@ namespace BlackjackStrategy.Models
                     BestFitnessSoFar = bestFitnessScoreAllTime,
                     TimeForGeneration = stopwatch.Elapsed
                 };
-                bool keepGoing = ProgressCallback(progress);
+                bool keepGoing = ProgressCallback(progress, bestSolutionThisGeneration);
                 if (!keepGoing) break;  // user signalled to end looping
 
                 // termination conditions

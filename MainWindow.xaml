@@ -138,6 +138,7 @@
                                Height="Auto"
                                TextWrapping="Wrap"
                                FontSize="12px"
+                               FontFamily="Courier Narrow"
                                HorizontalAlignment="Left" />
                 </ScrollViewer>
             </Grid>

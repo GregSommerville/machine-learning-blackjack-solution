@@ -1,13 +1,7 @@
 ﻿==========================
 TO DO
 ==========================
-- UI cleanup:
-	display each generation: best of that gen - passed as a param to the per-gen callback
-		- also, display * or something on the status msg when a new best is found
-		- format status msg so gens are 4 digits, best and averages have fixed widths, so everything lines up
 	add button to display and test hand-coded strategy
-	improve the algorithm by making pairs happen more: deck.MoveNextToTop(Ace), which makes that the next to be dealt, may shuffle if needed
-
+	tone down the brightness of the red cells
 	handle resize of main window.  
-	fix scrolling region for status messages (it extends beyond the visible), 
 	disable button when calculating

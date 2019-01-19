@@ -20,6 +20,7 @@ namespace BlackjackStrategy
         // each callback adds a progress string here 
         private List<string> progressMsg = new List<string>();
         private int totalGenerations;
+        private float bestOverallScoreSoFar, bestAverageScoreSoFar;
 
         public MainWindow()
         {
@@ -30,15 +31,14 @@ namespace BlackjackStrategy
         {
             gaResultTB.Text = "Creating solution, please wait...";
 
-            //var comparisonStrategy = new HandCodedStrategy();
-            //comparisonStrategy.LoadStandardStrategy();
-
+            bestOverallScoreSoFar = float.MinValue;
+            bestAverageScoreSoFar = float.MinValue;
 
             // Finding the solution takes a while, so kick off a thread for it
-            Task.Factory.StartNew(() => AsyncCall());
+            Task.Factory.StartNew(() => AsyncFindAndDisplaySolution());
         }
 
-        private void AsyncCall()
+        private void AsyncFindAndDisplaySolution()
         {
             progressMsg = new List<string>();
 
@@ -85,12 +85,25 @@ namespace BlackjackStrategy
         //-------------------------------------------------------------------------
         // For each generation, we get information about what's going on
         //-------------------------------------------------------------------------
-        private bool PerGenerationCallback(EngineProgress progress)
+        private bool PerGenerationCallback(EngineProgress progress, Strategy bestThisGen)
         {
+            string bestSuffix = " ", avgSuffix = " ";
+            if (progress.BestFitnessSoFar > bestOverallScoreSoFar)
+            {
+                bestOverallScoreSoFar = progress.BestFitnessSoFar;
+                bestSuffix = "*";
+            }
+            if (progress.AvgFitnessThisGen > bestAverageScoreSoFar)
+            {
+                bestAverageScoreSoFar = progress.AvgFitnessThisGen;
+                avgSuffix = "*";
+            }
+
             string summary =
-                "Gen " + progress.GenerationNumber +
-                " best: " + progress.BestFitnessThisGen.ToString("0") +
-                " avg: " + progress.AvgFitnessThisGen.ToString("0");
+                "Gen " + progress.GenerationNumber.ToString().PadLeft(4) + 
+                "  best: " + progress.BestFitnessThisGen.ToString("0").PadLeft(7) + bestSuffix +
+                "  avg: " + progress.AvgFitnessThisGen.ToString("0").PadLeft(7) + avgSuffix;
+                
             DisplayCurrentStatus(summary);
 
             Debug.WriteLine("Generation " + progress.GenerationNumber + " took " + progress.TimeForGeneration.TotalSeconds + " s");
@@ -119,6 +132,13 @@ namespace BlackjackStrategy
             // keep track of how many gens we've searched
             totalGenerations = progress.GenerationNumber;
 
+            // then display the final results
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                StrategyView.ShowPlayableHands(bestThisGen, canvas);
+            }),
+            DispatcherPriority.Background);
+
             // return true to keep going, false to halt the system
             bool keepRunning = true;
             return keepRunning;
@@ -135,7 +155,5 @@ namespace BlackjackStrategy
             }),
             DispatcherPriority.Background);
         }
-
-
     }
 }
