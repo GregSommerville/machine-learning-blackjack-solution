@@ -210,6 +210,8 @@ namespace BlackjackStrategy.Models
 
         public Card DealCard()
         {
+            ShuffleIfNeeded();
+
             //Debug.WriteLine("Dealing card from " + this.ToString());
             Debug.Assert(currentCard < Cards.Count, "Ran out of cards to deal");
 
@@ -246,6 +248,27 @@ namespace BlackjackStrategy.Models
         {
             return CardsRemaining + " remaining, first cards are " +
                 Cards[0].ToString() + " " + Cards[1].ToString() + " " + Cards[2].ToString();
+        }
+
+        public void Shuffle()
+        {
+            // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
+            int start = Cards.Count - 1;
+            for (int i = start; i > 1; i--)
+            {
+                int swapWith = Randomizer.IntLessThan(i);
+
+                Card hold = Cards[i];
+                Cards[i] = Cards[swapWith];
+                Cards[swapWith] = hold;
+            }
+            currentCard = 0;
+        }
+
+        public void ShuffleIfNeeded()
+        {
+            if (CardsRemaining < 20)
+                Shuffle();
         }
 
     }
