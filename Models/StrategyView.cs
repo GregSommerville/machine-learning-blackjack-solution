@@ -11,6 +11,11 @@ namespace BlackjackStrategy.Models
             // clear the screen
             canvas.Children.Clear();
 
+            Color   hitColor = Colors.LightGreen, 
+                    standColor = Color.FromRgb(252, 44, 44),
+                    doubleColor = Colors.Yellow, 
+                    splitColor = Colors.MediumPurple;
+
             // display a grid for non-paired hands without an ace.  One column for each possible dealer upcard
             AddColorBox(Colors.White, "", 0, 0, canvas);
             int x = 1, y = 0;
@@ -58,15 +63,15 @@ namespace BlackjackStrategy.Models
                     switch (action)
                     {
                         case ActionToTake.Hit:
-                            AddColorBox(Colors.Green, "H", x, y, canvas);
+                            AddColorBox(hitColor, "H", x, y, canvas);
                             break;
 
                         case ActionToTake.Stand:
-                            AddColorBox(Colors.Red, "S", x, y, canvas);
+                            AddColorBox(standColor, "S", x, y, canvas);
                             break;
 
                         case ActionToTake.Double:
-                            AddColorBox(Colors.Yellow, "D", x, y, canvas);
+                            AddColorBox(doubleColor, "D", x, y, canvas);
                             break;
                     }
                     y++;
@@ -111,15 +116,15 @@ namespace BlackjackStrategy.Models
                     switch (action)
                     {
                         case ActionToTake.Hit:
-                            AddColorBox(Colors.Green, "H", x, y, canvas);
+                            AddColorBox(hitColor, "H", x, y, canvas);
                             break;
 
                         case ActionToTake.Stand:
-                            AddColorBox(Colors.Red, "S", x, y, canvas);
+                            AddColorBox(standColor, "S", x, y, canvas);
                             break;
 
                         case ActionToTake.Double:
-                            AddColorBox(Colors.Yellow, "D", x, y, canvas);
+                            AddColorBox(doubleColor, "D", x, y, canvas);
                             break;
                     }
                     y++;
@@ -163,19 +168,19 @@ namespace BlackjackStrategy.Models
                     switch (action)
                     {
                         case ActionToTake.Hit:
-                            AddColorBox(Colors.Green, "H", x, y, canvas);
+                            AddColorBox(hitColor, "H", x, y, canvas);
                             break;
 
                         case ActionToTake.Stand:
-                            AddColorBox(Colors.Red, "S", x, y, canvas);
+                            AddColorBox(standColor, "S", x, y, canvas);
                             break;
 
                         case ActionToTake.Double:
-                            AddColorBox(Colors.Yellow, "D", x, y, canvas);
+                            AddColorBox(doubleColor, "D", x, y, canvas);
                             break;
 
                         case ActionToTake.Split:
-                            AddColorBox(Colors.LightBlue, "P", x, y, canvas);
+                            AddColorBox(splitColor, "P", x, y, canvas);
                             break;
                     }
                     y++;

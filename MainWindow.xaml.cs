@@ -21,6 +21,7 @@ namespace BlackjackStrategy
         private List<string> progressMsg = new List<string>();
         private int totalGenerations;
         private float bestOverallScoreSoFar, bestAverageScoreSoFar;
+        private Stopwatch stopwatch = new Stopwatch();
 
         public MainWindow()
         {
@@ -33,6 +34,7 @@ namespace BlackjackStrategy
 
             bestOverallScoreSoFar = float.MinValue;
             bestAverageScoreSoFar = float.MinValue;
+            stopwatch.Restart();
 
             // Finding the solution takes a while, so kick off a thread for it
             Task.Factory.StartNew(() => AsyncFindAndDisplaySolution());
@@ -53,6 +55,8 @@ namespace BlackjackStrategy
             // then display the final results
             Dispatcher.BeginInvoke(new Action(() =>
             {
+                stopwatch.Stop();
+
                 // draw the grids
                 StrategyView.ShowPlayableHands(strategy, canvas);
 
@@ -67,7 +71,11 @@ namespace BlackjackStrategy
                     scoreResults += score + "\n";
                 }
                 scoreResults += "\nAverage score: " + (totalScore / TestConditions.NumFinalTests).ToString("0");
-                gaResultTB.Text = "Solution found in " + totalGenerations + " gens\n\nTest Scores:\n" + scoreResults;
+                gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " + 
+                    stopwatch.Elapsed.Hours + "h " + 
+                    stopwatch.Elapsed.Minutes + "m " +
+                    stopwatch.Elapsed.Seconds + "s " +
+                    "\n\nTest Scores:\n" + scoreResults;
             }),
             DispatcherPriority.Background);
         }

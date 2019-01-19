@@ -30,7 +30,6 @@ namespace BlackjackStrategy.Models
 
             for (int handNum = 0; handNum < numHandsToPlay; handNum++)
             {
-                // for each hand, we generate a random deck.  Blackjack is often played with multiple decks to improve the house edge
                 Hand dealerHand = new Hand();
                 Hand playerHand = new Hand();
 
@@ -40,21 +39,17 @@ namespace BlackjackStrategy.Models
                 playerHand.AddCard(deck.DealCard());
                 playerHand.AddCard(deck.DealCard());
 
-                // save the cards in state, and reset the votes for this hand
                 List<Hand> playerHands = new List<Hand>();
                 playerHands.Add(playerHand);
 
-                // do the intial wager
+                // we need to track how much bet per hand, since you can double down after a split.
+                List<int> betAmountPerHand = new List<int>();
+                betAmountPerHand.Add(TestConditions.BetSize);
                 playerChips -= TestConditions.BetSize;
 
-                // we need to track how much bet per hand, since you can double down after a split.
-                List<int> betsForHands = new List<int>();
-                betsForHands.Add(TestConditions.BetSize);
-
-                // loop until the hand is done
                 var currentHandState = GameState.PlayerDrawing;
 
-                // loop is for each hand the player holds.  This only happens when they've split a hand.
+                // loop over each hand the player holds, which only happens when they've split a hand
                 for (int handIndex = 0; handIndex < playerHands.Count; handIndex++)
                 {
                     playerHand = playerHands[handIndex];
@@ -67,6 +62,7 @@ namespace BlackjackStrategy.Models
                         {
                             currentHandState = GameState.PlayerBlackjack;
                             playerChips += TestConditions.BlackjackPayoffSize;
+                            betAmountPerHand[handIndex] = 0;
                         }
                         else
                         {
@@ -95,10 +91,13 @@ namespace BlackjackStrategy.Models
                                 // if we're at 21, we're done
                                 if (playerHand.HandValue() == 21)
                                     currentHandState = GameState.DealerDrawing;
-                                
+
                                 // did we bust?
                                 if (playerHand.HandValue() > 21)
+                                {
                                     currentHandState = GameState.PlayerBusted;
+                                    betAmountPerHand[handIndex] = 0;
+                                }
                                 break;
 
                             case ActionToTake.Stand:
@@ -109,18 +108,19 @@ namespace BlackjackStrategy.Models
                             case ActionToTake.Double:
                                 // double down means bet another chip, and get one and only card card
                                 playerChips -= TestConditions.BetSize;
-                                //totalBetAmount += TestConditions.BetSize;
-                                betsForHands[handIndex] += TestConditions.BetSize;
+                                betAmountPerHand[handIndex] += TestConditions.BetSize;
 
                                 playerHand.AddCard(deck.DealCard());
                                 if (playerHand.HandValue() > 21)
+                                {
                                     currentHandState = GameState.PlayerBusted;
+                                    betAmountPerHand[handIndex] = 0;
+                                }
                                 else
                                     currentHandState = GameState.DealerDrawing;
                                 break;
 
                             case ActionToTake.Split:
-                                Debug.Assert(playerHand.IsPair(), "Split with non-pair!");
 
                                 // do the split and add the hand to our collection
                                 var newHand = new Hand();
@@ -129,12 +129,9 @@ namespace BlackjackStrategy.Models
                                 newHand.AddCard(deck.DealCard());
                                 playerHands.Add(newHand);
 
-                                // 16 because there are 4 of each rank * 4 decks = 16 possible hands if you split all of the Aces, for example
-                                Debug.Assert(playerHands.Count < 16, "Too many hands");
-
                                 // our extra bet
                                 playerChips -= TestConditions.BetSize;  // no need to adjust totalBetAmount 
-                                betsForHands.Add(TestConditions.BetSize);
+                                betAmountPerHand.Add(TestConditions.BetSize);
 
                                 // is the hand now 21?
                                 if (playerHand.HandValue() == 21)
@@ -143,6 +140,7 @@ namespace BlackjackStrategy.Models
                                     {
                                         currentHandState = GameState.PlayerBlackjack;
                                         playerChips += TestConditions.BlackjackPayoffSize;
+                                        betAmountPerHand[handIndex] = 0;    
                                     }
                                     else
                                     {
@@ -150,10 +148,6 @@ namespace BlackjackStrategy.Models
                                         currentHandState = GameState.HandComparison;
                                     }
                                 }
-
-                                // did we bust?
-                                if (playerHand.HandValue() > 21)
-                                    currentHandState = GameState.PlayerBusted;
 
                                 break;
                         }
@@ -170,10 +164,9 @@ namespace BlackjackStrategy.Models
                         {
                             currentHandState = GameState.DealerBusted;
 
-                            // payoff each hand that is still valid
+                            // payoff each hand that is still valid - busts and blackjacks have 0 for betAmountPerHand
                             for (int handIndex = 0; handIndex < playerHands.Count; handIndex++)
-                                if (playerHands[handIndex].HandValue() <= 21)
-                                    playerChips += betsForHands[handIndex] * 2;  // the original bet and a matching amount
+                                    playerChips += betAmountPerHand[handIndex] * 2;  // the original bet and a matching amount
                         }
                     }
                     else
@@ -191,19 +184,18 @@ namespace BlackjackStrategy.Models
                     for (int handIndex = 0; handIndex < playerHands.Count; handIndex++)
                     {
                         var playerHandValue = playerHands[handIndex].HandValue();
-                        if (playerHandValue > 21) continue; // skip the ones we busted on, since those have already been taken care of
 
                         // if it's a tie, give the player his bet back
                         if (playerHandValue == dealerHandValue)
                         {
-                            playerChips += betsForHands[handIndex];
+                            playerChips += betAmountPerHand[handIndex];
                         }
                         else
                         {
                             if (playerHandValue > dealerHandValue)
                             {
                                 // player won
-                                playerChips += betsForHands[handIndex] * 2;  // the original bet and a matching amount
+                                playerChips += betAmountPerHand[handIndex] * 2;  // the original bet and a matching amount
                             }
                             else
                             {

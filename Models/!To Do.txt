@@ -2,6 +2,8 @@
 TO DO
 ==========================
 	add button to display and test hand-coded strategy
-	tone down the brightness of the red cells
+	cell width should be canvas width / 25, and startx should be one cell width over.
+	cell height = cell width * 0.8
 	handle resize of main window.  
 	disable button when calculating
+	save image of each generation's rendering, combine later into gif
