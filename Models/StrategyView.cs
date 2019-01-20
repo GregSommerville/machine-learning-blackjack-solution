@@ -134,7 +134,7 @@ namespace BlackjackStrategy.Models
 
             // finally, a grid for pairs
             int startY = y + 1;
-            AddColorBox(Colors.White, "", leftColumnForAces, 0, canvas);
+            AddColorBox(Colors.White, "", leftColumnForAces, startY, canvas);
             x = leftColumnForAces + 1;
             foreach (var upcardRank in Card.ListOfRanks)
             {
@@ -145,8 +145,8 @@ namespace BlackjackStrategy.Models
                 string upcardRankName = Card.RankText(upcardRank);
                 Card dealerUpcard = new Card(upcardRank, Card.Suits.Diamonds);
 
-                AddColorBox(Colors.White, upcardRankName, x, 0, canvas);
-                y = startY;
+                AddColorBox(Colors.White, upcardRankName, x, startY, canvas);
+                y = startY + 1;
 
                 for (var pairedRank = Card.Ranks.Ace; pairedRank >= Card.Ranks.Two; pairedRank--)
                 {

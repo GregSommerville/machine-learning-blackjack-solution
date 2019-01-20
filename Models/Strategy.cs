@@ -35,7 +35,7 @@ namespace BlackjackStrategy.Models
 
         public void Mutate()
         {
-            // randomly set one cell in each of the arrays
+            // randomly set a cell or two in each of the arrays
 
             // first the pair mutation
             var upcardRank = GetRandomRankForMutation();
@@ -47,10 +47,13 @@ namespace BlackjackStrategy.Models
             var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
             SetActionForSoftHand(upcardRank, randomRemainder, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
 
-            // now hard hand
-            upcardRank = GetRandomRankForMutation();
-            var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
-            SetActionForHardHand(upcardRank, hardTotal, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
+            // now 2 hard hands, to even out the mutation's affect across the entire strategy
+            for (int i = 0; i < 2; i++)
+            {
+                upcardRank = GetRandomRankForMutation();
+                var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
+                SetActionForHardHand(upcardRank, hardTotal, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
+            }
         }
 
         private Card.Ranks GetRandomRankForMutation()

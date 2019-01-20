@@ -52,32 +52,9 @@ namespace BlackjackStrategy
             // and then let 'er rip
             var strategy = engine.FindBestSolution();
 
-            // then display the final results
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                stopwatch.Stop();
+            DisplayStrategyGrids(strategy);
+            DisplayStatistics(strategy);
 
-                // draw the grids
-                StrategyView.ShowPlayableHands(strategy, canvas);
-
-                // test it and display scores
-                string scoreResults = "";
-                var tester = new StrategyTester(strategy);
-                int totalScore = 0;
-                for (int i = 0; i < TestConditions.NumFinalTests; i++)
-                {
-                    int score = tester.GetStrategyScore(TestConditions.NumHandsToPlay);
-                    totalScore += score;
-                    scoreResults += score + "\n";
-                }
-                scoreResults += "\nAverage score: " + (totalScore / TestConditions.NumFinalTests).ToString("0");
-                gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " + 
-                    stopwatch.Elapsed.Hours + "h " + 
-                    stopwatch.Elapsed.Minutes + "m " +
-                    stopwatch.Elapsed.Seconds + "s " +
-                    "\n\nTest Scores:\n" + scoreResults;
-            }),
-            DispatcherPriority.Background);
         }
 
         //-------------------------------------------------------------------------
@@ -114,7 +91,8 @@ namespace BlackjackStrategy
                 
             DisplayCurrentStatus(summary);
 
-            Debug.WriteLine("Generation " + progress.GenerationNumber + " took " + progress.TimeForGeneration.TotalSeconds + " s");
+            Debug.WriteLine("Generation " + progress.GenerationNumber + 
+                " took " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s");
 
             // all settings in one column
             string settings =
@@ -141,15 +119,20 @@ namespace BlackjackStrategy
             totalGenerations = progress.GenerationNumber;
 
             // then display the final results
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                StrategyView.ShowPlayableHands(bestThisGen, canvas);
-            }),
-            DispatcherPriority.Background);
+            DisplayStrategyGrids(bestThisGen);
 
             // return true to keep going, false to halt the system
             bool keepRunning = true;
             return keepRunning;
+        }
+
+        private void DisplayStrategyGrids(Strategy strategy)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                StrategyView.ShowPlayableHands(strategy, canvas);
+            }),
+            DispatcherPriority.ContextIdle);
         }
 
         private void DisplayCurrentStatus(string status)
@@ -162,6 +145,34 @@ namespace BlackjackStrategy
                 gaResultTB.Text = allStatuses;
             }),
             DispatcherPriority.Background);
+        }
+
+        private void DisplayStatistics(Strategy strategy)
+        {
+            // then display the final results
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                stopwatch.Stop();
+
+                // test it and display scores
+                string scoreResults = "";
+                var tester = new StrategyTester(strategy);
+                int totalScore = 0;
+                for (int i = 0; i < TestConditions.NumFinalTests; i++)
+                {
+                    int score = tester.GetStrategyScore(TestConditions.NumHandsToPlay);
+                    totalScore += score;
+                    scoreResults += score + "\n";
+                }
+                scoreResults += "\nAverage score: " + (totalScore / TestConditions.NumFinalTests).ToString("0");
+                gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " +
+                    stopwatch.Elapsed.Hours + "h " +
+                    stopwatch.Elapsed.Minutes + "m " +
+                    stopwatch.Elapsed.Seconds + "s " +
+                    "\n\nTest Scores:\n" + scoreResults;
+            }),
+            DispatcherPriority.Background);
+
         }
     }
 }

@@ -1,9 +1,14 @@
 ﻿==========================
 TO DO
 ==========================
-	add button to display and test hand-coded strategy
-	cell width should be canvas width / 25, and startx should be one cell width over.
-	cell height = cell width * 0.8
-	handle resize of main window.  
-	disable button when calculating
-	save image of each generation's rendering, combine later into gif
+tester.EvenlyDistributedStartingHands = true means:
+	pairs dealt 29% of the time
+	soft hands 23% of the time
+	hard hards 48% of the time
+
+add button to display and test hand-coded strategy
+cell width should be canvas width / 25, and startx should be one cell width over.
+cell height = cell width * 0.8
+handle resize of main window.  
+disable button when calculating
+save image of each generation's rendering, combine later into gif
