@@ -51,10 +51,8 @@ namespace BlackjackStrategy
 
             // and then let 'er rip
             var strategy = engine.FindBestSolution();
-
             DisplayStrategyGrids(strategy);
             DisplayStatistics(strategy);
-
         }
 
         //-------------------------------------------------------------------------
@@ -132,7 +130,7 @@ namespace BlackjackStrategy
             {
                 StrategyView.ShowPlayableHands(strategy, canvas);
             }),
-            DispatcherPriority.ContextIdle);
+            DispatcherPriority.Background);
         }
 
         private void DisplayCurrentStatus(string status)
