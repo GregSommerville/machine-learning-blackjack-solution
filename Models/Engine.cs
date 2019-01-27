@@ -188,18 +188,23 @@ namespace BlackjackStrategy.Models
                     candidate.Fitness = fitness--;
             }
 
-            // and calc total and highest fitness for two kinds of selections
+            // and calc total for two kinds of selections
             totalFitness = 0;
-            float largestFitness = float.MinValue;
             if (currentEngineParams.SelectionStyle == SelectionStyle.RouletteWheel || 
                 currentEngineParams.SelectionStyle == SelectionStyle.Ranked)
             {
+                float smallestFitness = currentGeneration.Min(c => c.Fitness);
+                float addToEach = 0;
+                if (smallestFitness < 0)
+                {
+                    // need to add the minimum so we have all positive fitnesses
+                    addToEach = Math.Abs(smallestFitness);
+                }
+
                 foreach (var candidate in currentGeneration)
                 {
-                    float fitness = candidate.Fitness;
-                    totalFitness += fitness;
-                    if (fitness > largestFitness)
-                        largestFitness = fitness;
+                    candidate.Fitness += addToEach;                    
+                    totalFitness += candidate.Fitness;
                 }
             }
         }

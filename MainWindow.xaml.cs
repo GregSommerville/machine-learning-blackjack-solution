@@ -99,7 +99,6 @@ namespace BlackjackStrategy
                 "Stgn: " + EngineParams.MaxStagnantGenerations + " " +
                 "Sel: " + EngineParams.SelectionStyle + " " +
                 "Trny: " + EngineParams.TourneySize + " " +
-                "Cross: " + EngineParams.CrossoverRate + " " +
                 "Mut: " + EngineParams.MutationRate + " " +
                 "Elit: " + EngineParams.ElitismRate + " ";
 

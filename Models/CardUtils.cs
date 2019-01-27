@@ -219,24 +219,6 @@ namespace BlackjackStrategy.Models
             return Cards[currentCard++];
         }
 
-        internal Card DealNextOfRank(Card.Ranks rank)
-        {
-            int index = currentCard;
-            while (Cards[index].Rank != rank) index++;
-            var card = Cards[index];
-            Cards.Remove(card);
-            return card;
-        }
-
-        internal Card DealNextNotOfRank(Card.Ranks rank)
-        {
-            int index = currentCard;
-            while (Cards[index].Rank == rank) index++;
-            var card = Cards[index];
-            Cards.Remove(card);
-            return card;
-        }
-
         public int CardsRemaining {
             get
             {

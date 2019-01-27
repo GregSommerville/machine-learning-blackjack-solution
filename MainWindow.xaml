@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Optimal Blackjack Strategy Finder Using a Genetic Algorithm"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Manual"
+        Height="700"
+        Width="900"
         WindowStartupLocation="CenterScreen"
         Background="DarkGray"
         x:Name="_this"
@@ -71,109 +73,66 @@
     </Window.Resources>
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
-            <ColumnDefinition Width="960" />
+            <ColumnDefinition Width="325" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Border Grid.Column="0"
                 Grid.Row="0"
-                Height="670"
-                BorderThickness="10 10 10 0"
+                BorderThickness="8 8 4 8"
                 Background="LightGray">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <DockPanel LastChildFill="True"
+                       VerticalAlignment="Stretch"
+                       Margin="8">
                 <Label Content="Genetic Algorithm Settings"
-                       Grid.Column="0"
-                       Grid.Row="0"
+                       DockPanel.Dock="Top"
                        Margin="0 0 0 10"
                        Style="{StaticResource HeadingStyle}" />
                 <xctk:PropertyGrid x:Name="_propGrid"
-                                   Grid.Row="1"
                                    Padding="0"
+                                   DockPanel.Dock="Top"
                                    NameColumnWidth="180"
                                    ShowSearchBox="False"
                                    ShowSortOptions="False"
                                    ShowTitle="False"
                                    ShowAdvancedOptions="False"
-                                   ShowPreview="False"
+                                   ShowPreview="false"
                                    ShowSummary="False"
                                    SelectedObject="{Binding ElementName=_this, Path=EngineParams}"
                                    Margin="0" />
-                <StackPanel Grid.Row="6"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
-                    <Button HorizontalAlignment="Left"
-                            x:Name="btnSolve"
-                            Click="btnSolve_Click">Find Solution</Button>
-                </StackPanel>
-                <ScrollViewer Height="280"
-                              Width="255"
-                              Grid.Column="0"
-                              Grid.Row="7"
-                              Margin="0 10 0 0"
-                              HorizontalAlignment="Left">
+                <Button HorizontalAlignment="Left"
+                        x:Name="btnSolve"
+                        DockPanel.Dock="Top"
+                        Click="btnSolve_Click">Find Solution</Button>
+                <ScrollViewer DockPanel.Dock="Top"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch">
                     <TextBlock x:Name="gaResultTB"
                                VerticalAlignment="Top"
                                Text="Configure settings,then click on the green Find Solution button to proceed"
-                               Margin="10,0,0,11"
-                               Height="Auto"
+                               Margin="10"
                                TextWrapping="Wrap"
                                FontSize="12px"
-                               FontFamily="Courier Narrow"
                                HorizontalAlignment="Left" />
                 </ScrollViewer>
-            </Grid>
+            </DockPanel>
         </Border>
         <Border Grid.Column="1"
                 Grid.Row="0"
-                Grid.RowSpan="3"
-                BorderThickness="5 10 10 10"
-                HorizontalAlignment="Left"
-                Background="LightGray">
-            <Grid Margin="0"
-                  Width="950"
-                  Height="660">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Border BorderThickness="2"
-                        Grid.Column="0"
-                        Grid.Row="1"
-                        Height="640"
-                        Width="925"
-                        Margin="10,10,5,11"
-                        BorderBrush="Black"
-                        Grid.ColumnSpan="2">
-                    <Canvas x:Name="canvas"
-                            Background="AntiqueWhite"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch">
-                    </Canvas>
-                </Border>
-            </Grid>
+                Grid.RowSpan="2"
+                BorderThickness="4 8 8 8"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                Background="LightGray"
+                >
+            <Canvas x:Name="canvas"
+                    Background="AntiqueWhite"
+                    Width="auto"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+            </Canvas>
         </Border>
     </Grid>
 </Window>
