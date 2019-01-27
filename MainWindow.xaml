@@ -5,7 +5,7 @@
         Title="Optimal Blackjack Strategy Finder Using a Genetic Algorithm"
         SizeToContent="Manual"
         Height="700"
-        Width="900"
+        Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="DarkGray"
         x:Name="_this"
@@ -129,9 +129,14 @@
                 >
             <Canvas x:Name="canvas"
                     Background="AntiqueWhite"
-                    Width="auto"
+                    Width="auto"                    
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch">
+                <TextBlock TextWrapping="Wrap" Margin="20" Width="500">
+                This program builds a strategy to play Blackjack using a genetic algorithm. 
+                Adjust the settings in the property grid (left) and press the Find Solution button.  
+                Each generation will display its best solution, until the final solution is displayed.    
+                </TextBlock>
             </Canvas>
         </Border>
     </Grid>

@@ -36,6 +36,8 @@ namespace BlackjackStrategy
             bestAverageScoreSoFar = float.MinValue;
             stopwatch.Restart();
 
+            btnSolve.IsEnabled = false;
+
             // Finding the solution takes a while, so kick off a thread for it
             Task.Factory.StartNew(() => AsyncFindAndDisplaySolution());
         }
@@ -53,6 +55,8 @@ namespace BlackjackStrategy
             var strategy = engine.FindBestSolution();
             DisplayStrategyGrids(strategy);
             DisplayStatistics(strategy);
+
+            btnSolve.IsEnabled = true;
         }
 
         //-------------------------------------------------------------------------

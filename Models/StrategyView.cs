@@ -191,12 +191,10 @@ namespace BlackjackStrategy.Models
 
         private static void AddColorBox(Color color, string label, int x, int y, Canvas canvas)
         {
-            // easy to do constants when the screen isn't meant to resize
-            const int
-                columnWidth = 38,
-                rowHeight = 28,
-                startX = 20,
-                startY = 20;
+            int columnWidth = (int) canvas.ActualWidth / 25; 
+            int rowHeight = (columnWidth * 4) / 5;
+            int startX = columnWidth;
+            int startY = columnWidth;
 
             // the element is a border
             var box = new Border();
