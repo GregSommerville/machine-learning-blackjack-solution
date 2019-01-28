@@ -42,6 +42,14 @@ namespace BlackjackStrategy
             Task.Factory.StartNew(() => AsyncFindAndDisplaySolution());
         }
 
+        private void btnShowKnown_Click(object sender, RoutedEventArgs e)
+        {
+            var strategy = new HandCodedStrategy();
+            strategy.LoadStandardStrategy();
+            DisplayStrategyGrids(strategy);
+            DisplayStatistics(strategy);
+        }
+
         private void AsyncFindAndDisplaySolution()
         {
             progressMsg = new List<string>();
@@ -55,8 +63,6 @@ namespace BlackjackStrategy
             var strategy = engine.FindBestSolution();
             DisplayStrategyGrids(strategy);
             DisplayStatistics(strategy);
-
-            btnSolve.IsEnabled = true;
         }
 
         //-------------------------------------------------------------------------
@@ -127,7 +133,7 @@ namespace BlackjackStrategy
             return keepRunning;
         }
 
-        private void DisplayStrategyGrids(Strategy strategy)
+        private void DisplayStrategyGrids(StrategyBase strategy)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -148,7 +154,7 @@ namespace BlackjackStrategy
             DispatcherPriority.Background);
         }
 
-        private void DisplayStatistics(Strategy strategy)
+        private void DisplayStatistics(StrategyBase strategy)
         {
             // then display the final results
             Dispatcher.BeginInvoke(new Action(() =>
@@ -171,6 +177,9 @@ namespace BlackjackStrategy
                     stopwatch.Elapsed.Minutes + "m " +
                     stopwatch.Elapsed.Seconds + "s " +
                     "\n\nTest Scores:\n" + scoreResults;
+
+                btnSolve.IsEnabled = true;
+
             }),
             DispatcherPriority.Background);
 

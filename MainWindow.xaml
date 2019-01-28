@@ -102,10 +102,14 @@
                                    ShowSummary="False"
                                    SelectedObject="{Binding ElementName=_this, Path=EngineParams}"
                                    Margin="0" />
-                <Button HorizontalAlignment="Left"
-                        x:Name="btnSolve"
-                        DockPanel.Dock="Top"
-                        Click="btnSolve_Click">Find Solution</Button>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Button HorizontalAlignment="Left"
+                            x:Name="btnSolve"
+                            Click="btnSolve_Click">Find Solution</Button>
+                    <Button HorizontalAlignment="Left"
+                            x:Name="btnShowKnown"
+                            Click="btnShowKnown_Click">Show Known</Button>
+                </StackPanel>
                 <ScrollViewer DockPanel.Dock="Top"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">

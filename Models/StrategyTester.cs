@@ -18,9 +18,11 @@ namespace BlackjackStrategy.Models
 
     class StrategyTester
     {
-        private Strategy strategy;
+        public bool UseEvenDistribution { get; set; }
+
+        private StrategyBase strategy;
         
-        public StrategyTester(Strategy strategy)
+        public StrategyTester(StrategyBase strategy)
         {
             this.strategy = strategy;
         }

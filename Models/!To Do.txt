@@ -1,11 +1,4 @@
 ﻿==========================
 TO DO
 ==========================
--tester.EvenlyDistributedStartingHands = true means:
-	pairs dealt 29% of the time
-	soft hands 23% of the time
-	hard hards 48% of the time
-
-add button to display and test hand-coded strategy
-
 save image of each generation's rendering, combine later into gif

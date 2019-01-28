@@ -6,7 +6,7 @@ namespace BlackjackStrategy.Models
 {
     class StrategyView
     {
-        public static void ShowPlayableHands(Strategy strategy, Canvas canvas)
+        public static void ShowPlayableHands(StrategyBase strategy, Canvas canvas)
         {
             // clear the screen
             canvas.Children.Clear();
