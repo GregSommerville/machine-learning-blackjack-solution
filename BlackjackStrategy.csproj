@@ -92,6 +92,7 @@
     <Compile Include="Models\EngineParameters.cs" />
     <Compile Include="Models\EngineProgress.cs" />
     <Compile Include="Models\HandCodedStrategy.cs" />
+    <Compile Include="Models\ProgramSettings.cs" />
     <Compile Include="Models\Randomizer.cs" />
     <Compile Include="Models\Strategy.cs" />
     <Compile Include="Models\StrategyBase.cs" />

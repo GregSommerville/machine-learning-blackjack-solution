@@ -73,7 +73,7 @@
     </Window.Resources>
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="325" />
+            <ColumnDefinition Width="350" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -90,17 +90,18 @@
                        DockPanel.Dock="Top"
                        Margin="0 0 0 10"
                        Style="{StaticResource HeadingStyle}" />
-                <xctk:PropertyGrid x:Name="_propGrid"
+                <xctk:PropertyGrid x:Name="propGrid"
                                    Padding="0"
                                    DockPanel.Dock="Top"
-                                   NameColumnWidth="180"
+                                   NameColumnWidth="200"
                                    ShowSearchBox="False"
                                    ShowSortOptions="False"
                                    ShowTitle="False"
                                    ShowAdvancedOptions="False"
                                    ShowPreview="false"
                                    ShowSummary="False"
-                                   SelectedObject="{Binding ElementName=_this, Path=EngineParams}"
+                                   IsMiscCategoryLabelHidden="True"
+                                   SelectedObject="{Binding ElementName=_this, Path=ProgramConfiguration}"
                                    Margin="0" />
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Button HorizontalAlignment="Left"

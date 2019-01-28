@@ -21,16 +21,18 @@ namespace BlackjackStrategy.Models
         public bool UseEvenDistribution { get; set; }
 
         private StrategyBase strategy;
+        private TestConditions conditions;
         
-        public StrategyTester(StrategyBase strategy)
+        public StrategyTester(StrategyBase strategy, TestConditions conditions)
         {
             this.strategy = strategy;
+            this.conditions = conditions;
         }
 
         public int GetStrategyScore(int numHandsToPlay)
         {
             int playerChips = 0;
-            MultiDeck deck = new MultiDeck(TestConditions.NumDecks);
+            MultiDeck deck = new MultiDeck(conditions.NumDecks);
 
             for (int handNum = 0; handNum < numHandsToPlay; handNum++)
             {
@@ -41,6 +43,27 @@ namespace BlackjackStrategy.Models
                 dealerHand.AddCard(deck.DealCard());
 
                 playerHand.AddCard(deck.DealCard());
+                if (UseEvenDistribution)
+                {
+                    // even out the hands dealt to the player so it's proportionate to the 
+                    // number of cells in the three grids
+                    var rand = Randomizer.GetFloatFromZeroToOne();
+                    if (rand < 0.29)
+                    {
+                        // deal a pair
+                        deck.ForceNextCardToBe(playerHand.Cards[0].Rank);
+                    }
+                    if (rand >= 0.29 && rand < 0.52)
+                    {
+                        // deal a soft hand
+                        if (playerHand.Cards[0].Rank != Card.Ranks.Ace)
+                            deck.ForceNextCardToBe(Card.Ranks.Ace);
+                        else
+                            deck.EnsureNextCardIsnt(Card.Ranks.Ace);    // avoid a pair of Aces
+                    }
+                    // yes, our normal deal for hard hands may result in a pair or a hard hand, but 
+                    // we don't care since we're just trying to even out the proportion of those type of hands
+                }
                 playerHand.AddCard(deck.DealCard());
 
                 List<Hand> playerHands = new List<Hand>();
@@ -48,8 +71,8 @@ namespace BlackjackStrategy.Models
 
                 // we need to track how much bet per hand, since you can double down after a split.
                 List<int> betAmountPerHand = new List<int>();
-                betAmountPerHand.Add(TestConditions.BetSize);
-                playerChips -= TestConditions.BetSize;
+                betAmountPerHand.Add(conditions.BetSize);
+                playerChips -= conditions.BetSize;
 
                 //  1. check for player Blackjack
                 if (playerHand.HandValue() == 21)
@@ -62,7 +85,7 @@ namespace BlackjackStrategy.Models
                     else
                     {
                         // Blackjack typically pays 3:2, although some casinos do 5:4
-                        playerChips += TestConditions.BlackjackPayoffSize;
+                        playerChips += conditions.BlackjackPayoffSize;
                     }
                     betAmountPerHand[0] = 0;
                     continue;   // go to next hand
@@ -85,7 +108,7 @@ namespace BlackjackStrategy.Models
                         {
                             if (playerHand.Cards.Count == 2)    // Blackjack
                             {
-                                int blackjackPayoff = TestConditions.BlackjackPayoffSize * betAmountPerHand[handIndex] / TestConditions.BetSize;
+                                int blackjackPayoff = conditions.BlackjackPayoffSize * betAmountPerHand[handIndex] / conditions.BetSize;
                                 playerChips += blackjackPayoff;
                                 betAmountPerHand[handIndex] = 0;
                             }
@@ -122,8 +145,8 @@ namespace BlackjackStrategy.Models
 
                             case ActionToTake.Double:
                                 // double down means bet another chip, and get one and only card card
-                                playerChips -= TestConditions.BetSize;
-                                betAmountPerHand[handIndex] += TestConditions.BetSize;
+                                playerChips -= conditions.BetSize;
+                                betAmountPerHand[handIndex] += conditions.BetSize;
 
                                 playerHand.AddCard(deck.DealCard());
                                 if (playerHand.HandValue() > 21)
@@ -144,8 +167,8 @@ namespace BlackjackStrategy.Models
                                 playerHands.Add(newHand);
 
                                 // our extra bet
-                                playerChips -= TestConditions.BetSize;  
-                                betAmountPerHand.Add(TestConditions.BetSize);
+                                playerChips -= conditions.BetSize;  
+                                betAmountPerHand.Add(conditions.BetSize);
 
                                 break;
                         }

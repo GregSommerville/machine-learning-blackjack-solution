@@ -15,7 +15,7 @@ namespace BlackjackStrategy
     public partial class MainWindow : Window
     {
         // This parameters object is bound to the UI, for editing
-        public EngineParameters EngineParams { get; set; } = new EngineParameters();
+        public ProgramSettings ProgramConfiguration { get; set; } = new ProgramSettings();
 
         // each callback adds a progress string here 
         private List<string> progressMsg = new List<string>();
@@ -26,6 +26,7 @@ namespace BlackjackStrategy
         public MainWindow()
         {
             InitializeComponent();
+            propGrid.ExpandAllProperties();
         }
 
         private void btnSolve_Click(object sender, RoutedEventArgs e)
@@ -55,7 +56,7 @@ namespace BlackjackStrategy
             progressMsg = new List<string>();
 
             // instantiate the engine with params, then set the callbacks for per-generation and for candidate evaluation
-            var engine = new Engine(EngineParams);
+            var engine = new Engine(ProgramConfiguration.GAsettings);
             engine.ProgressCallback = PerGenerationCallback;
             engine.FitnessFunction = EvaluateCandidate;
 
@@ -71,8 +72,10 @@ namespace BlackjackStrategy
         private float EvaluateCandidate(Strategy candidate)
         {
             // test the strategy and return the total money lost/made
-            var strategyTester = new StrategyTester(candidate);
-            return strategyTester.GetStrategyScore(TestConditions.NumHandsToPlay);
+            var strategyTester = new StrategyTester(candidate, ProgramConfiguration.TestSettings);
+            strategyTester.UseEvenDistribution = ProgramConfiguration.TestSettings.UseBalancedDeck;
+
+            return strategyTester.GetStrategyScore(ProgramConfiguration.TestSettings.NumHandsToPlay);
         }
 
         //-------------------------------------------------------------------------
@@ -104,13 +107,13 @@ namespace BlackjackStrategy
 
             // all settings in one column
             string settings =
-                "P: " + EngineParams.PopulationSize + " " +
-                "G: " + EngineParams.MinGenerations + " - " + EngineParams.MaxGenerations + " " +
-                "Stgn: " + EngineParams.MaxStagnantGenerations + " " +
-                "Sel: " + EngineParams.SelectionStyle + " " +
-                "Trny: " + EngineParams.TourneySize + " " +
-                "Mut: " + EngineParams.MutationRate + " " +
-                "Elit: " + EngineParams.ElitismRate + " ";
+                "P: " + ProgramConfiguration.GAsettings.PopulationSize + " " +
+                "G: " + ProgramConfiguration.GAsettings.MinGenerations + " - " + ProgramConfiguration.GAsettings.MaxGenerations + " " +
+                "Stgn: " + ProgramConfiguration.GAsettings.MaxStagnantGenerations + " " +
+                "Sel: " + ProgramConfiguration.GAsettings.SelectionStyle + " " +
+                "Trny: " + ProgramConfiguration.GAsettings.TourneySize + " " +
+                "Mut: " + ProgramConfiguration.GAsettings.MutationRate + " " +
+                "Elit: " + ProgramConfiguration.GAsettings.ElitismRate + " ";
 
             // save stats: date, gen#, best-this-gen, avg-this-gen, settings
             var writer = File.AppendText("per-gen-stats.csv");
@@ -137,7 +140,11 @@ namespace BlackjackStrategy
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                StrategyView.ShowPlayableHands(strategy, canvas);
+                string imgFilename = "";
+                if (ProgramConfiguration.TestSettings.SaveImgPerGen)
+                    imgFilename = "gen" + totalGenerations;
+
+                StrategyView.ShowPlayableHands(strategy, canvas, imgFilename);
             }),
             DispatcherPriority.Background);
         }
@@ -163,15 +170,15 @@ namespace BlackjackStrategy
 
                 // test it and display scores
                 string scoreResults = "";
-                var tester = new StrategyTester(strategy);
+                var tester = new StrategyTester(strategy, ProgramConfiguration.TestSettings);
                 int totalScore = 0;
-                for (int i = 0; i < TestConditions.NumFinalTests; i++)
+                for (int i = 0; i < ProgramConfiguration.TestSettings.NumFinalTests; i++)
                 {
-                    int score = tester.GetStrategyScore(TestConditions.NumHandsToPlay);
+                    int score = tester.GetStrategyScore(ProgramConfiguration.TestSettings.NumHandsToPlay);
                     totalScore += score;
                     scoreResults += score + "\n";
                 }
-                scoreResults += "\nAverage score: " + (totalScore / TestConditions.NumFinalTests).ToString("0");
+                scoreResults += "\nAverage score: " + (totalScore / ProgramConfiguration.TestSettings.NumFinalTests).ToString("0");
                 gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " +
                     stopwatch.Elapsed.Hours + "h " +
                     stopwatch.Elapsed.Minutes + "m " +

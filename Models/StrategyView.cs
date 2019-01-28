@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace BlackjackStrategy.Models
 {
     class StrategyView
     {
-        public static void ShowPlayableHands(StrategyBase strategy, Canvas canvas)
+        public static void ShowPlayableHands(StrategyBase strategy, Canvas canvas, string savedImageName)
         {
             // clear the screen
             canvas.Children.Clear();
@@ -187,6 +188,10 @@ namespace BlackjackStrategy.Models
                 }
                 x++;
             }
+
+            // now that's it's drawn, save an image?
+            if (!string.IsNullOrEmpty(savedImageName))
+                SaveImageOfCanvas(canvas, savedImageName);
         }
 
         private static void AddColorBox(Color color, string label, int x, int y, Canvas canvas)
@@ -216,5 +221,31 @@ namespace BlackjackStrategy.Models
             Canvas.SetLeft(box, startX + x * columnWidth);
         }
 
+        private static void SaveImageOfCanvas(Canvas canvas, string savedImageName)
+        {
+            Size size = canvas.RenderSize;
+            Rect rect = new Rect(size);
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+                (int)rect.Right,
+                (int)rect.Bottom, 
+                96d, 96d, 
+                PixelFormats.Default);
+
+            // make sure all of the children show up
+            canvas.Measure(size);
+            canvas.Arrange(rect);
+            rtb.Render(canvas);
+
+            //endcode as PNG
+            BitmapEncoder pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(rtb));
+
+            //save to memory stream
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            pngEncoder.Save(ms);
+            ms.Close();
+            System.IO.File.WriteAllBytes(savedImageName + ".png", ms.ToArray());
+        }
     }
 }

@@ -1,4 +1,3 @@
 ﻿==========================
 TO DO
 ==========================
-save image of each generation's rendering, combine later into gif

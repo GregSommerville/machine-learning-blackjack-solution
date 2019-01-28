@@ -219,6 +219,47 @@ namespace BlackjackStrategy.Models
             return Cards[currentCard++];
         }
 
+        public void ForceNextCardToBe(Card.Ranks rank)
+        {
+            // to compensate for the fact that pairs and soft hands don't happen that often,
+            // we may wish to force a card to be dealt next
+
+            // first, look for the rank in the remaining cards
+            int foundAt = -1;
+            for (int i = currentCard; i < Cards.Count; i++)
+                if (Cards[i].Rank == rank)
+                {
+                    foundAt = i;
+                    break;
+                }
+
+            // if not found, start over from the start of the deck
+            if (foundAt == -1)
+            {
+                for (int i = 0; i < currentCard; i++)
+                    if (Cards[i].Rank == rank)
+                    {
+                        foundAt = i;
+                        break;
+                    }
+            }
+
+            // now swap that card with the next-to-be-dealt
+            Card temp = Cards[foundAt];
+            Cards[foundAt] = Cards[currentCard];
+            Cards[currentCard] = temp;
+        }
+
+        public void EnsureNextCardIsnt(Card.Ranks rank)
+        {
+            // similar to ForceNextCardToBe, this is used for stacking the deck
+            while (Cards[currentCard].Rank == rank)
+            {
+                currentCard++;
+                ShuffleIfNeeded();
+            }
+        }
+
         public int CardsRemaining {
             get
             {

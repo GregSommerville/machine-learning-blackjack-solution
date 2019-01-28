@@ -1,7 +1,11 @@
-﻿namespace BlackjackStrategy.Models
+﻿using System.ComponentModel;
+
+namespace BlackjackStrategy.Models
 {
     public enum SelectionStyle { Tourney, RouletteWheel, Ranked };
 
+    [DisplayName("Genetic Algorithm Settings")]
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     public sealed class EngineParameters
     {
         public int? PopulationSize { get; set; } = 500;
