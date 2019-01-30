@@ -113,6 +113,7 @@ namespace BlackjackStrategy
                 "Sel: " + ProgramConfiguration.GAsettings.SelectionStyle + " " +
                 "Trny: " + ProgramConfiguration.GAsettings.TourneySize + " " +
                 "Mut: " + ProgramConfiguration.GAsettings.MutationRate + " " +
+                "MI: " + ProgramConfiguration.GAsettings.MutationImpact + " " + 
                 "Elit: " + ProgramConfiguration.GAsettings.ElitismRate + " ";
 
             // save stats: date, gen#, best-this-gen, avg-this-gen, settings

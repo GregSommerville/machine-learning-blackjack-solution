@@ -18,6 +18,7 @@ namespace BlackjackStrategy.Models
         public double MutationRate { get; set; } = 0.10;
         public double MutationImpact { get; set; } = 0.05;
 
+        // so it looks right in the property grid
         public override string ToString()
         {
             return "";

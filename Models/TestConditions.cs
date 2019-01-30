@@ -14,6 +14,7 @@ namespace BlackjackStrategy.Models
         public bool StackTheDeck { get; set; } = true;
         public bool SaveImagePerGeneration { get; set; } = false;
 
+        // so it looks right in the property grid
         public override string ToString()
         {
             return "";

@@ -212,33 +212,22 @@ namespace BlackjackStrategy.Models
 
         public MultiDeck(int numDecks)
         {
-            Cards = CreateRandomDeck(numDecks);
+            CreateRandomDeck(numDecks);
         }
 
-        static private List<Card> CreateRandomDeck(int numDecks)
+        private void CreateRandomDeck(int numDecks)
         {
-            List<Card> deck = new List<Card>(52 * numDecks);
+            Cards = new List<Card>(52 * numDecks);
 
             for (int i = 0; i < numDecks; i++)
                 foreach (var rank in Card.ListOfRanks)
                     foreach (var suit in Card.ListOfSuits)
                     {
                         var card = new Card(rank, suit);
-                        deck.Add(card);
+                        Cards.Add(card);
                     }
 
-            // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
-            int start = deck.Count - 1;
-            for (int i = start; i > 1; i--)
-            {
-                int swapWith = Randomizer.IntLessThan(i);
-
-                Card hold = deck[i];
-                deck[i] = deck[swapWith];
-                deck[swapWith] = hold;
-            }
-
-            return deck;
+            Shuffle();
         }
 
         public Card DealCard()
