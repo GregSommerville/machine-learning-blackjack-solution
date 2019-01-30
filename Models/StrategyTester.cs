@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Diagnostics;
 using System.Linq;
 
 namespace BlackjackStrategy.Models
@@ -18,7 +16,7 @@ namespace BlackjackStrategy.Models
 
     class StrategyTester
     {
-        public bool UseEvenDistribution { get; set; }
+        public bool StackTheDeck { get; set; }
 
         private StrategyBase strategy;
         private TestConditions conditions;
@@ -43,17 +41,17 @@ namespace BlackjackStrategy.Models
                 dealerHand.AddCard(deck.DealCard());
 
                 playerHand.AddCard(deck.DealCard());
-                if (UseEvenDistribution)
+                if (StackTheDeck)
                 {
                     // even out the hands dealt to the player so it's proportionate to the 
                     // number of cells in the three grids
                     var rand = Randomizer.GetFloatFromZeroToOne();
-                    if (rand < 0.29)
+                    if (rand < 0.33F)
                     {
                         // deal a pair
                         deck.ForceNextCardToBe(playerHand.Cards[0].Rank);
                     }
-                    if (rand >= 0.29 && rand < 0.52)
+                    if (rand >= 0.33F && rand < 0.66F)
                     {
                         // deal a soft hand
                         if (playerHand.Cards[0].Rank != Card.Ranks.Ace)

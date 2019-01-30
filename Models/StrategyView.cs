@@ -191,7 +191,7 @@ namespace BlackjackStrategy.Models
 
             // now that's it's drawn, save an image?
             if (!string.IsNullOrEmpty(savedImageName))
-                SaveImageOfCanvas(canvas, savedImageName);
+                SaveCanvasToPng(canvas, savedImageName);
         }
 
         private static void AddColorBox(Color color, string label, int x, int y, Canvas canvas)
@@ -221,7 +221,7 @@ namespace BlackjackStrategy.Models
             Canvas.SetLeft(box, startX + x * columnWidth);
         }
 
-        private static void SaveImageOfCanvas(Canvas canvas, string savedImageName)
+        private static void SaveCanvasToPng(Canvas canvas, string savedImageName)
         {
             Size size = canvas.RenderSize;
             Rect rect = new Rect(size);

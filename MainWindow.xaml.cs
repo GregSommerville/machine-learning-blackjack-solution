@@ -37,7 +37,7 @@ namespace BlackjackStrategy
             bestAverageScoreSoFar = float.MinValue;
             stopwatch.Restart();
 
-            btnSolve.IsEnabled = false;
+            SetButtonsEnabled(false);
 
             // Finding the solution takes a while, so kick off a thread for it
             Task.Factory.StartNew(() => AsyncFindAndDisplaySolution());
@@ -73,7 +73,7 @@ namespace BlackjackStrategy
         {
             // test the strategy and return the total money lost/made
             var strategyTester = new StrategyTester(candidate, ProgramConfiguration.TestSettings);
-            strategyTester.UseEvenDistribution = ProgramConfiguration.TestSettings.UseBalancedDeck;
+            strategyTester.StackTheDeck = ProgramConfiguration.TestSettings.StackTheDeck;
 
             return strategyTester.GetStrategyScore(ProgramConfiguration.TestSettings.NumHandsToPlay);
         }
@@ -141,7 +141,7 @@ namespace BlackjackStrategy
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 string imgFilename = "";
-                if (ProgramConfiguration.TestSettings.SaveImgPerGen)
+                if (ProgramConfiguration.TestSettings.SaveImagePerGeneration)
                     imgFilename = "gen" + totalGenerations;
 
                 StrategyView.ShowPlayableHands(strategy, canvas, imgFilename);
@@ -157,6 +157,16 @@ namespace BlackjackStrategy
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 gaResultTB.Text = allStatuses;
+            }),
+            DispatcherPriority.Background);
+        }
+
+        private void SetButtonsEnabled(bool enable)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                btnSolve.IsEnabled = enable;
+                btnShowKnown.IsEnabled = enable;
             }),
             DispatcherPriority.Background);
         }
@@ -184,9 +194,6 @@ namespace BlackjackStrategy
                     stopwatch.Elapsed.Minutes + "m " +
                     stopwatch.Elapsed.Seconds + "s " +
                     "\n\nTest Scores:\n" + scoreResults;
-
-                btnSolve.IsEnabled = true;
-
             }),
             DispatcherPriority.Background);
 

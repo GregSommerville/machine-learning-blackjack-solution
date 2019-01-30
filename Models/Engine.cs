@@ -34,7 +34,7 @@ namespace BlackjackStrategy.Models
 
             // depending on whether elitism is used, or the selection type, we may need to sort candidates by fitness (which is slower)
             bool needToSortByFitness =
-                currentEngineParams.SelectionStyle == SelectionStyle.RouletteWheel ||
+                currentEngineParams.SelectionStyle == SelectionStyle.Roulette ||
                 currentEngineParams.SelectionStyle == SelectionStyle.Ranked ||
                 currentEngineParams.ElitismRate > 0;
 
@@ -89,7 +89,7 @@ namespace BlackjackStrategy.Models
                 }
 
                 // determine average fitness and store if it's all-time best
-                float averageFitness = totalFitness / currentEngineParams.PopulationSize.Value;
+                float averageFitness = totalFitness / currentEngineParams.PopulationSize;
                 if (averageFitness > bestAverageFitnessScore)
                 {
                     bestAverageFitnessGenerationNumber = currentGenerationNumber;
@@ -136,6 +136,10 @@ namespace BlackjackStrategy.Models
                 foreach (var peakPerformer in theBest)
                     nextGeneration.Add(peakPerformer);
 
+                // if we're doing elitism and the all-time best is from a previous generation, add it 
+                if ((numElitesToAdd > 0) && (currentGenerationNumber != bestSolutionGenerationNumber))
+                    nextGeneration.Add(BestSolution.Clone());
+
                 // now create a new generation using fitness scores for selection, and crossover and mutation
                 while (nextGeneration.Count < currentEngineParams.PopulationSize)
                 {
@@ -148,7 +152,7 @@ namespace BlackjackStrategy.Models
                             parent2 = TournamentSelectParent();
                             break;
 
-                        case SelectionStyle.RouletteWheel:
+                        case SelectionStyle.Roulette:
                         case SelectionStyle.Ranked:
                             parent1 = RouletteSelectParent();
                             parent2 = RouletteSelectParent();
@@ -161,7 +165,7 @@ namespace BlackjackStrategy.Models
 
                     // Mutation
                     if (Randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
-                        child.Mutate();
+                        child.Mutate(currentEngineParams.MutationImpact);
 
                     // then add to the new generation 
                     nextGeneration.Add(child);
@@ -190,7 +194,7 @@ namespace BlackjackStrategy.Models
 
             // and calc total for two kinds of selections
             totalFitness = 0;
-            if (currentEngineParams.SelectionStyle == SelectionStyle.RouletteWheel || 
+            if (currentEngineParams.SelectionStyle == SelectionStyle.Roulette || 
                 currentEngineParams.SelectionStyle == SelectionStyle.Ranked)
             {
                 float smallestFitness = currentGeneration.Min(c => c.Fitness);
@@ -218,7 +222,7 @@ namespace BlackjackStrategy.Models
 
             for (int i = 0; i < currentEngineParams.TourneySize; i++)
             {
-                int index = Randomizer.IntLessThan(currentEngineParams.PopulationSize.Value);
+                int index = Randomizer.IntLessThan(currentEngineParams.PopulationSize);
                 var randomCandidate = currentGeneration[index];
                 var fitness = randomCandidate.Fitness;
 
@@ -246,8 +250,7 @@ namespace BlackjackStrategy.Models
                 }
             }
 
-            return currentGeneration[currentEngineParams.PopulationSize.Value - 1];
+            return currentGeneration[currentEngineParams.PopulationSize - 1];
         }
-
     }
 }

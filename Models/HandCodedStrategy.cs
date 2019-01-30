@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BlackjackStrategy.Models
 {
+    // This class uses the standard Basic Strategy for Blackjack that is found in most
+    // books or web resources that talk about Blackjack
     class HandCodedStrategy : StrategyBase
     {
         public HandCodedStrategy() 

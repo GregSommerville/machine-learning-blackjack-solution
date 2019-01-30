@@ -4,7 +4,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Optimal Blackjack Strategy Finder Using a Genetic Algorithm"
         SizeToContent="Manual"
-        Height="700"
+        Height="800"
         Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="DarkGray"
@@ -73,7 +73,7 @@
     </Window.Resources>
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="320" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -86,10 +86,6 @@
             <DockPanel LastChildFill="True"
                        VerticalAlignment="Stretch"
                        Margin="8">
-                <Label Content="Genetic Algorithm Settings"
-                       DockPanel.Dock="Top"
-                       Margin="0 0 0 10"
-                       Style="{StaticResource HeadingStyle}" />
                 <xctk:PropertyGrid x:Name="propGrid"
                                    Padding="0"
                                    DockPanel.Dock="Top"

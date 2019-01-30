@@ -11,7 +11,12 @@ namespace BlackjackStrategy.Models
         public int BetSize { get; set; } = 2;
         public int BlackjackPayoffSize { get; set; } = 3;   // if you have a blackjack, most casinos pay off 3:2
         public int NumFinalTests  { get; set; }= 10;
-        public bool UseBalancedDeck { get; set; } = true;
-        public bool SaveImgPerGen { get; set; } = false;
+        public bool StackTheDeck { get; set; } = true;
+        public bool SaveImagePerGeneration { get; set; } = false;
+
+        public override string ToString()
+        {
+            return "";
+        }
     }
 }

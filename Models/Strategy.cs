@@ -21,38 +21,49 @@ namespace BlackjackStrategy.Models
             {
                 // randomize pairs
                 foreach (var pairRank in Card.ListOfRanks)
-                    SetActionForPair(upcardRank, pairRank, (ActionToTake)Randomizer.IntLessThan(NumActionsWithSplit));
+                    SetActionForPair(upcardRank, pairRank, GetRandomAction(true));
 
                 // and soft hands
                 for (int softRemainder = 2; softRemainder <= HighestSoftHandRemainder; softRemainder++)
-                    SetActionForSoftHand(upcardRank, softRemainder, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
+                    SetActionForSoftHand(upcardRank, softRemainder, GetRandomAction(false));
 
                 // and hard hands
                 for (int hardValue = 5; hardValue <= HighestHardHandValue; hardValue++)
-                    SetActionForHardHand(upcardRank, hardValue, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
+                    SetActionForHardHand(upcardRank, hardValue, GetRandomAction(false));
             }
         }
 
-        public void Mutate()
+        public void Mutate(double impact)
         {
-            // randomly set a cell or two in each of the arrays
+            // impact is the % of cells that should be mutated
 
-            // first the pair mutation
-            var upcardRank = GetRandomRankForMutation();
-            var randomPairRank = GetRandomRankForMutation();
-            SetActionForPair(upcardRank, randomPairRank, (ActionToTake)Randomizer.IntLessThan(NumActionsWithSplit));
+            // randomly set cells in each of the arrays
+            int NumPairMutations = (int) (100F * impact);     // 10 possible holdings x 10 upcards
+            int NumSoftMutations = (int) (80F * impact);     // 8 possible holdings
+            int NumHardMutations = (int) (160F * impact);     // 16 possible holdings
 
-            // then soft card mutation
-            upcardRank = GetRandomRankForMutation();
-            var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
-            SetActionForSoftHand(upcardRank, randomRemainder, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
-
-            // now 2 hard hands, to even out the mutation's affect across the entire strategy
-            for (int i = 0; i < 2; i++)
+            // pairs
+            for (int i = 0; i < NumPairMutations; i++)
             {
-                upcardRank = GetRandomRankForMutation();
+                var upcardRank = GetRandomRankForMutation();
+                var randomPairRank = GetRandomRankForMutation();
+                SetActionForPair(upcardRank, randomPairRank, GetRandomAction(true));
+            }
+
+            // soft hands
+            for (int i = 0; i < NumSoftMutations; i++)
+            {
+                var upcardRank = GetRandomRankForMutation();
+                var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
+                SetActionForSoftHand(upcardRank, randomRemainder, GetRandomAction(false));
+            }
+
+            // hard hands
+            for (int i = 0; i < NumHardMutations; i++)
+            {
+                var upcardRank = GetRandomRankForMutation();
                 var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
-                SetActionForHardHand(upcardRank, hardTotal, (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit));
+                SetActionForHardHand(upcardRank, hardTotal, GetRandomAction(false));
             }
         }
 
@@ -66,6 +77,13 @@ namespace BlackjackStrategy.Models
                    rank == Card.Ranks.Jack);
 
             return rank;
+        }
+
+        private ActionToTake GetRandomAction(bool includeSplit)
+        {
+            return includeSplit ? 
+                (ActionToTake)Randomizer.IntLessThan(NumActionsWithSplit) :
+                (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit);
         }
 
         public Strategy CrossOverWith(Strategy otherParent)
@@ -102,10 +120,6 @@ namespace BlackjackStrategy.Models
                 percentageChanceOfMine = 1 - (myScore / (myScore + theirScore));
             }
 
-            // and make sure we get some kind of crossover, so clamp values between 0.2 and 0.8
-            if (percentageChanceOfMine > 0.8F) percentageChanceOfMine = 0.8F;
-            if (percentageChanceOfMine < 0.2F) percentageChanceOfMine = 0.2F;
-
             var child = new Strategy();
             foreach (var upcardRank in Card.ListOfRanks)
             {
@@ -120,7 +134,7 @@ namespace BlackjackStrategy.Models
                 }
 
                 // populate the soft hands
-                for (int softRemainder = 2; softRemainder <= HighestSoftHandRemainder; softRemainder++)
+                for (int softRemainder = LowestSoftHandRemainder; softRemainder <= HighestSoftHandRemainder; softRemainder++)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForSoftHand(upcardRank, softRemainder, 
@@ -130,7 +144,7 @@ namespace BlackjackStrategy.Models
                 }
 
                 // populate the hard hands
-                for (int hardValue = 5; hardValue <= HighestHardHandValue; hardValue++)
+                for (int hardValue = LowestHardHandValue; hardValue <= HighestHardHandValue; hardValue++)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForHardHand(upcardRank, hardValue, 

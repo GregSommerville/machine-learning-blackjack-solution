@@ -149,11 +149,17 @@ namespace BlackjackStrategy.Models
         public bool HasSoftAce()
         {
             // first, we need to have an ace
-            if (!Cards.Any(c => c.Rank == Card.Ranks.Ace)) return false;
+            int numAces = Cards.Count(c => c.Rank == Card.Ranks.Ace);
+            if (numAces == 0) return false;
 
-            // and if it counts as 11 and we have a valid hand, then we have a soft ace
-            int highTotal = Cards.Sum(c => c.RankValueHigh);
-            return (highTotal <= 21);
+            // if we have more than one Ace, we try one as high and the rest as low
+            int total = 11 + 
+                Cards
+                    .Where(c => c.Rank != Card.Ranks.Ace)
+                    .Sum(c => c.RankValueLow) + 
+                (numAces - 1);
+
+            return (total <= 21);
         }
 
         public int HandValue()
@@ -181,7 +187,7 @@ namespace BlackjackStrategy.Models
                 }
                 else
                 {
-                    highValue += card.RankValueHigh;
+                    highValue += card.RankValueLow; // for non-Aces, RankValueLow == RankValueHigh
                     lowValue += card.RankValueLow;
                 }
             }
@@ -191,6 +197,7 @@ namespace BlackjackStrategy.Models
 
             // if the high value > 21, return the low
             if (highValue > 21) return lowValue;
+
             // else the high, which will be the same value as the low except when there's an Ace in the hand
             return highValue;
         }
@@ -205,17 +212,38 @@ namespace BlackjackStrategy.Models
 
         public MultiDeck(int numDecks)
         {
-            Cards = CardUtils.GetRandomDeck(numDecks);
+            Cards = CreateRandomDeck(numDecks);
+        }
+
+        static private List<Card> CreateRandomDeck(int numDecks)
+        {
+            List<Card> deck = new List<Card>(52 * numDecks);
+
+            for (int i = 0; i < numDecks; i++)
+                foreach (var rank in Card.ListOfRanks)
+                    foreach (var suit in Card.ListOfSuits)
+                    {
+                        var card = new Card(rank, suit);
+                        deck.Add(card);
+                    }
+
+            // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
+            int start = deck.Count - 1;
+            for (int i = start; i > 1; i--)
+            {
+                int swapWith = Randomizer.IntLessThan(i);
+
+                Card hold = deck[i];
+                deck[i] = deck[swapWith];
+                deck[swapWith] = hold;
+            }
+
+            return deck;
         }
 
         public Card DealCard()
         {
             ShuffleIfNeeded();
-
-            //Debug.WriteLine("Dealing card from " + this.ToString());
-            Debug.Assert(currentCard < Cards.Count, "Ran out of cards to deal");
-
-            // bad code - it doesn't deal with running out of cards
             return Cards[currentCard++];
         }
 
@@ -269,8 +297,7 @@ namespace BlackjackStrategy.Models
 
         public override string ToString()
         {
-            return CardsRemaining + " remaining, first cards are " +
-                Cards[0].ToString() + " " + Cards[1].ToString() + " " + Cards[2].ToString();
+            return CardsRemaining + " remaining";
         }
 
         public void Shuffle()
@@ -292,39 +319,6 @@ namespace BlackjackStrategy.Models
         {
             if (CardsRemaining < 20)
                 Shuffle();
-        }
-
-    }
-
-    //=======================================================================
-
-    class CardUtils
-    {
-        static public List<Card> GetRandomDeck(int numDecks)
-        {
-            // initially populate
-            List<Card> deck = new List<Card>(52 * numDecks);
-
-            for (int i = 0; i < numDecks; i++)
-                foreach (var rank in Card.ListOfRanks)
-                    foreach (var suit in Card.ListOfSuits)
-                    {
-                        var card = new Card(rank, suit);
-                        deck.Add(card);
-                    }
-
-            // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
-            int start = deck.Count - 1;
-            for (int i = start; i > 1; i--)
-            {
-                int swapWith = Randomizer.IntLessThan(i);
-
-                Card hold = deck[i];
-                deck[i] = deck[swapWith];
-                deck[swapWith] = hold;
-            }
-
-            return deck;
         }
     }
 }
