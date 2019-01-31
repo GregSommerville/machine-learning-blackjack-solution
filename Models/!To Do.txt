@@ -1,3 +1,4 @@
 ﻿==========================
 TO DO
 ==========================
+- add text element to canvas showing gen #, or final with # gens

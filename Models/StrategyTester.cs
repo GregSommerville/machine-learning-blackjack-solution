@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BlackjackStrategy.Models
@@ -19,18 +20,18 @@ namespace BlackjackStrategy.Models
         public bool StackTheDeck { get; set; }
 
         private StrategyBase strategy;
-        private TestConditions conditions;
+        private TestConditions testConditions;
         
         public StrategyTester(StrategyBase strategy, TestConditions conditions)
         {
             this.strategy = strategy;
-            this.conditions = conditions;
+            this.testConditions = conditions;
         }
 
         public int GetStrategyScore(int numHandsToPlay)
         {
             int playerChips = 0;
-            MultiDeck deck = new MultiDeck(conditions.NumDecks);
+            MultiDeck deck = new MultiDeck(testConditions.NumDecks);
 
             for (int handNum = 0; handNum < numHandsToPlay; handNum++)
             {
@@ -69,8 +70,8 @@ namespace BlackjackStrategy.Models
 
                 // we need to track how much bet per hand, since you can double down after a split.
                 List<int> betAmountPerHand = new List<int>();
-                betAmountPerHand.Add(conditions.BetSize);
-                playerChips -= conditions.BetSize;
+                betAmountPerHand.Add(testConditions.BetSize);
+                playerChips -= testConditions.BetSize;
 
                 //  1. check for player Blackjack
                 if (playerHand.HandValue() == 21)
@@ -83,7 +84,7 @@ namespace BlackjackStrategy.Models
                     else
                     {
                         // Blackjack typically pays 3:2, although some casinos do 5:4
-                        playerChips += conditions.BlackjackPayoffSize;
+                        playerChips += testConditions.BlackjackPayoffSize;
                     }
                     betAmountPerHand[0] = 0;
                     continue;   // go to next hand
@@ -106,7 +107,7 @@ namespace BlackjackStrategy.Models
                         {
                             if (playerHand.Cards.Count == 2)    // Blackjack
                             {
-                                int blackjackPayoff = conditions.BlackjackPayoffSize * betAmountPerHand[handIndex] / conditions.BetSize;
+                                int blackjackPayoff = testConditions.BlackjackPayoffSize * betAmountPerHand[handIndex] / testConditions.BetSize;
                                 playerChips += blackjackPayoff;
                                 betAmountPerHand[handIndex] = 0;
                             }
@@ -143,8 +144,8 @@ namespace BlackjackStrategy.Models
 
                             case ActionToTake.Double:
                                 // double down means bet another chip, and get one and only card card
-                                playerChips -= conditions.BetSize;
-                                betAmountPerHand[handIndex] += conditions.BetSize;
+                                playerChips -= testConditions.BetSize;
+                                betAmountPerHand[handIndex] += testConditions.BetSize;
 
                                 playerHand.AddCard(deck.DealCard());
                                 if (playerHand.HandValue() > 21)
@@ -165,8 +166,8 @@ namespace BlackjackStrategy.Models
                                 playerHands.Add(newHand);
 
                                 // our extra bet
-                                playerChips -= conditions.BetSize;  
-                                betAmountPerHand.Add(conditions.BetSize);
+                                playerChips -= testConditions.BetSize;  
+                                betAmountPerHand.Add(testConditions.BetSize);
 
                                 break;
                         }
@@ -225,5 +226,29 @@ namespace BlackjackStrategy.Models
 
             return playerChips;
         }
+
+        public void GetStatistics(out double average, out double stdDev, out double coeffVariation)
+        {
+            int numTests = testConditions.NumFinalTests;
+            int totalScore = 0;
+            List<int> scores = new List<int>();
+            for (int i = 0; i < numTests; i++)
+            {
+                int score = GetStrategyScore(testConditions.NumHandsToPlay);
+                totalScore += score;
+                scores.Add(score);
+            }
+
+            average = totalScore / numTests;
+            stdDev = StandardDeviation(scores);
+            coeffVariation = stdDev / average;
+        }
+
+        private double StandardDeviation(IEnumerable<int> values)
+        {
+            double avg = values.Average();
+            return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
+        }
+
     }
 }

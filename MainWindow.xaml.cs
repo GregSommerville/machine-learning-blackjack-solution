@@ -185,23 +185,14 @@ namespace BlackjackStrategy
 
                 // test it and display scores
                 var tester = new StrategyTester(strategy, ProgramConfiguration.TestSettings);
-                int totalScore = 0;
-                List<int> scores = new List<int>();
-                for (int i = 0; i < ProgramConfiguration.TestSettings.NumFinalTests; i++)
-                {
-                    int score = tester.GetStrategyScore(ProgramConfiguration.TestSettings.NumHandsToPlay);
-                    totalScore += score;
-                    scores.Add(score);
-                }
 
-                double average = totalScore / ProgramConfiguration.TestSettings.NumFinalTests;
-                double stdDev = StandardDeviation(scores);
-                double coeffVariability = stdDev / average;
+                double average, stdDev, coeffVariation;
+                tester.GetStatistics(out average, out stdDev, out coeffVariation);
 
                 string scoreResults =
                     "\nAverage score: " + average.ToString("0") +
                     "\nStandard Deviation: " + stdDev.ToString("0") +
-                    "\nCoeff. of Variability: " + coeffVariability.ToString("0.0000");
+                    "\nCoeff. of Variation: " + coeffVariation.ToString("0.0000");
 
                 gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " +
                     stopwatch.Elapsed.Hours + "h " +
@@ -212,10 +203,5 @@ namespace BlackjackStrategy
             DispatcherPriority.Background);
         }
 
-        public static double StandardDeviation(IEnumerable<int> values)
-        {
-            double avg = values.Average();
-            return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
-        }
     }
 }
