@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Threading;
 
 namespace BlackjackStrategy.Models
 {
     public class Randomizer
     {
-        private static Random randomizer = new Random();
+        [ThreadStatic] private static Random randomizer;
+
+        // Using a [ThreadStatic] attribute means we need to check for initialization
+        private static void CreateIfNeeded()
+        {
+            if (randomizer == null)
+                randomizer = new Random(Guid.NewGuid().GetHashCode());
+        }
 
         /// <summary>
         /// Inclusive, random value returned may include either upper or lower boundary.  Safe for multi-threading.
@@ -14,10 +22,8 @@ namespace BlackjackStrategy.Models
         /// <returns></returns>
         public static int IntBetween(int lower, int upper)
         {
-            lock (randomizer)
-            {
-                return randomizer.Next(lower, upper);
-            }
+            CreateIfNeeded();
+            return randomizer.Next(lower, upper);
         }
 
         /// <summary>
@@ -27,10 +33,8 @@ namespace BlackjackStrategy.Models
         /// <returns></returns>
         public static int IntLessThan(int upper)
         {
-            lock (randomizer)
-            {
-                return randomizer.Next(upper);
-            }
+            CreateIfNeeded();
+            return randomizer.Next(upper);
         }
 
         /// <summary>
@@ -39,12 +43,9 @@ namespace BlackjackStrategy.Models
         /// <returns></returns>
         public static double GetDoubleFromZeroToOne()
         {
-            lock (randomizer)
-            {
-                return randomizer.NextDouble();
-            }
+            CreateIfNeeded();
+            return randomizer.NextDouble();
         }
-
 
         /// <summary>
         /// Returns a float >= 0 and less than 1.0.  Safe for multi-threading.
@@ -52,10 +53,8 @@ namespace BlackjackStrategy.Models
         /// <returns></returns>
         public static float GetFloatFromZeroToOne()
         {
-            lock (randomizer)
-            {
-                return (float)randomizer.NextDouble();
-            }
+            CreateIfNeeded();
+            return (float)randomizer.NextDouble();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using System.Linq;
 
 namespace BlackjackStrategy
 {
@@ -64,6 +65,8 @@ namespace BlackjackStrategy
             var strategy = engine.FindBestSolution();
             DisplayStrategyGrids(strategy);
             DisplayStatistics(strategy);
+
+            SetButtonsEnabled(true);
         }
 
         //-------------------------------------------------------------------------
@@ -96,9 +99,10 @@ namespace BlackjackStrategy
             }
 
             string summary =
-                "Gen " + progress.GenerationNumber.ToString().PadLeft(4) + 
+                "Gen " + progress.GenerationNumber.ToString().PadLeft(4) +
                 "  best: " + progress.BestFitnessThisGen.ToString("0").PadLeft(7) + bestSuffix +
-                "  avg: " + progress.AvgFitnessThisGen.ToString("0").PadLeft(7) + avgSuffix;
+                "  avg: " + progress.AvgFitnessThisGen.ToString("0").PadLeft(7) + avgSuffix +
+                "  " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s";
                 
             DisplayCurrentStatus(summary);
 
@@ -180,24 +184,38 @@ namespace BlackjackStrategy
                 stopwatch.Stop();
 
                 // test it and display scores
-                string scoreResults = "";
                 var tester = new StrategyTester(strategy, ProgramConfiguration.TestSettings);
                 int totalScore = 0;
+                List<int> scores = new List<int>();
                 for (int i = 0; i < ProgramConfiguration.TestSettings.NumFinalTests; i++)
                 {
                     int score = tester.GetStrategyScore(ProgramConfiguration.TestSettings.NumHandsToPlay);
                     totalScore += score;
-                    scoreResults += score + "\n";
+                    scores.Add(score);
                 }
-                scoreResults += "\nAverage score: " + (totalScore / ProgramConfiguration.TestSettings.NumFinalTests).ToString("0");
+
+                double average = totalScore / ProgramConfiguration.TestSettings.NumFinalTests;
+                double stdDev = StandardDeviation(scores);
+                double coeffVariability = stdDev / average;
+
+                string scoreResults =
+                    "\nAverage score: " + average.ToString("0") +
+                    "\nStandard Deviation: " + stdDev.ToString("0") +
+                    "\nCoeff. of Variability: " + coeffVariability.ToString("0.0000");
+
                 gaResultTB.Text = "Solution found in " + totalGenerations + " generations\nElapsed: " +
                     stopwatch.Elapsed.Hours + "h " +
                     stopwatch.Elapsed.Minutes + "m " +
                     stopwatch.Elapsed.Seconds + "s " +
-                    "\n\nTest Scores:\n" + scoreResults;
+                    "\n\nTest Results:" + scoreResults;
             }),
             DispatcherPriority.Background);
+        }
 
+        public static double StandardDeviation(IEnumerable<int> values)
+        {
+            double avg = values.Average();
+            return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
         }
     }
 }

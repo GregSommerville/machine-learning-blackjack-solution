@@ -8,15 +8,32 @@ namespace BlackjackStrategy.Models
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public sealed class EngineParameters
     {
-        public int PopulationSize { get; set; } = 500;
-        public int TourneySize { get; set; } = 3;
+        [Description("Number of candidates per generation")]
+        public int PopulationSize { get; set; } = 550;
+
+        [Description("If using Tourney Selection, how many to select")]
+        public int TourneySize { get; set; } = 4;
+
+        [Description("Min number of generations it must run")]
         public int MinGenerations { get; set; } = 50;
-        public int MaxGenerations { get; set; } = 750;
-        public int MaxStagnantGenerations { get; set; } = 25;
-        public SelectionStyle SelectionStyle { get; set; } = Models.SelectionStyle.Tourney;  
+
+        [Description("Max number of generations it can run")]
+        public int MaxGenerations { get; set; } = 200;
+
+        [Description("Execution stops after this # gens with no improvement in best or average scores")]
+        public int MaxStagnantGenerations { get; set; } = 20;
+
+        [Description("How parents are selected for crossover")]
+        public SelectionStyle SelectionStyle { get; set; } = Models.SelectionStyle.Roulette;  
+
+        [Description("From 0.0 to 1.0, percentage of the best scoring candidates moved to the next generation")]
         public double ElitismRate { get; set; } = 0.20;
-        public double MutationRate { get; set; } = 0.10;
-        public double MutationImpact { get; set; } = 0.05;
+
+        [Description("From 0.0 to 1.0, percentage of candidates that are mutated")]
+        public double MutationRate { get; set; } = 0;
+
+        [Description("From 0.0 to 1.0, percentage of table cells that get mutated")]
+        public double MutationImpact { get; set; } = 0.10;
 
         // so it looks right in the property grid
         public override string ToString()
