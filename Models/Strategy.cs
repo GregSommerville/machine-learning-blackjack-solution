@@ -5,14 +5,12 @@ namespace BlackjackStrategy.Models
     // encapsulates one complete strategy to play Blackjack
     class Strategy : StrategyBase
     {
-        public float Fitness { get; set; } = 0;
-
         public Strategy Clone()
         {
-            var clone = new Strategy();
-            clone.DeepCopy(this);
-            clone.Fitness = this.Fitness;
-            return clone;
+            var result = new Strategy();
+            result.DeepCopy(this);
+
+            return result;
         }
 
         public void Randomize()
@@ -86,7 +84,7 @@ namespace BlackjackStrategy.Models
                 (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit);
         }
 
-        public Strategy CrossOverWith(Strategy otherParent)
+        public void CrossOverWith(Strategy otherParent, Strategy child)
         {
             // here we create one child, with genetic information from each parent 
             // in proportion to their relative fitness scores
@@ -120,7 +118,6 @@ namespace BlackjackStrategy.Models
                 percentageChanceOfMine = 1 - (myScore / (myScore + theirScore));
             }
 
-            var child = new Strategy();
             foreach (var upcardRank in Card.ListOfRanks)
             {
                 // populate the pairs
@@ -153,8 +150,6 @@ namespace BlackjackStrategy.Models
                         otherParent.GetActionForHardHand(upcardRank, hardValue));
                 }
             }
-
-            return child;
         }
     }
 }

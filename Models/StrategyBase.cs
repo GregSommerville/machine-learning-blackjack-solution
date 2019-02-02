@@ -21,6 +21,8 @@ namespace BlackjackStrategy.Models
         public static int LowestHardHandValue = 5;
         public static int HighestHardHandValue = 20;
 
+        public float Fitness { get; set; } = 0;
+
         private ActionToTake[,] pairsStrategy, softStrategy, hardStrategy;
 
         public StrategyBase()
@@ -33,6 +35,7 @@ namespace BlackjackStrategy.Models
 
         public void DeepCopy(StrategyBase copyFrom)
         {
+            this.Fitness = copyFrom.Fitness;
             pairsStrategy = (ActionToTake[,])copyFrom.pairsStrategy.Clone();
             softStrategy = (ActionToTake[,])copyFrom.softStrategy.Clone();
             hardStrategy = (ActionToTake[,])copyFrom.hardStrategy.Clone();

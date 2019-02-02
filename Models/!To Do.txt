@@ -1,7 +1,3 @@
 ﻿==========================
 TO DO
 ==========================
-Need factory class for candidate objects to reduce garbage collection
-	factory.GetNew()
-	factory.GetCopyOf(candidate)
-    factory.DiscardAll()

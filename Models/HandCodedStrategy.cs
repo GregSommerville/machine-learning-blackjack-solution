@@ -6,10 +6,6 @@ namespace BlackjackStrategy.Models
     // books or web resources that talk about Blackjack
     class HandCodedStrategy : StrategyBase
     {
-        public HandCodedStrategy() 
-        {
-        }
-
         public void LoadStandardStrategy()
         {
             // default for everything is "Stand", so fill in the rest

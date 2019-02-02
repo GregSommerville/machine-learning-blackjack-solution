@@ -16,6 +16,7 @@ namespace BlackjackStrategy.Models
 
         private EngineParameters currentEngineParams = new EngineParameters();  // with defaults
         private List<Strategy> currentGeneration = new List<Strategy>();
+        private StrategyFactory currentGenPool, nextGenPool;
         private float totalFitness = 0;
 
         public Engine(EngineParameters userParams)
@@ -29,7 +30,13 @@ namespace BlackjackStrategy.Models
             float bestFitnessScoreAllTime = float.MinValue;
             float bestAverageFitnessScore = float.MinValue;
             int bestSolutionGenerationNumber = 0, bestAverageFitnessGenerationNumber = 0;
+
+            // a list of references to objects in our pool
             List<Strategy> nextGeneration = new List<Strategy>();
+
+            // factory class handles a pool of candidates, so we aren't constantly creating and destroying
+            currentGenPool = new StrategyFactory(currentEngineParams.PopulationSize); 
+            nextGenPool = new StrategyFactory(currentEngineParams.PopulationSize);
 
             // elitism
             int numElitesToAdd = (int)(currentEngineParams.ElitismRate * currentEngineParams.PopulationSize);
@@ -43,8 +50,7 @@ namespace BlackjackStrategy.Models
             // initialize generation 0 with randomness
             for (int n = 0; n < currentEngineParams.PopulationSize; n++)
             {
-                var strategy = new Strategy();
-                strategy.Randomize();
+                var strategy = currentGenPool.GetRandomized();
                 currentGeneration.Add(strategy);
             }
 
@@ -132,6 +138,7 @@ namespace BlackjackStrategy.Models
 
                 // Start building the next generation
                 nextGeneration.Clear();
+                nextGenPool.Reset();
 
                 // Elitism
                 var theBest = currentGeneration.Take(numElitesToAdd);
@@ -140,7 +147,7 @@ namespace BlackjackStrategy.Models
 
                 // if we're doing elitism and the all-time best is from a previous generation, add it 
                 if ((numElitesToAdd > 0) && (currentGenerationNumber != bestSolutionGenerationNumber))
-                    nextGeneration.Add(BestSolution.Clone());
+                    nextGeneration.Add(nextGenPool.CopyOf(BestSolution));
 
                 // then do the selection, crossover and mutation to populate the rest of the next generation
                 var children = SelectCrossOverAndMutate(currentEngineParams.PopulationSize - nextGeneration.Count);
@@ -148,6 +155,7 @@ namespace BlackjackStrategy.Models
 
                 // move to the next generation
                 currentGeneration.Clear();
+                currentGenPool.Reset();
                 currentGeneration.AddRange(nextGeneration);
                 
                 currentGenerationNumber++;
@@ -213,8 +221,8 @@ namespace BlackjackStrategy.Models
                     }
 
                     // cross them over to generate a new child
-                    Strategy child;
-                    child = parent1.CrossOverWith(parent2);
+                    Strategy child = nextGenPool.GetEmpty();
+                    parent1.CrossOverWith(parent2, child);
 
                     // Mutation
                     if (Randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
