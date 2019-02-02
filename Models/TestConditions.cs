@@ -19,7 +19,7 @@ namespace BlackjackStrategy.Models
         public int BlackjackPayoffSize { get; set; } = 3;   // if you have a blackjack, most casinos pay off 3:2
 
         [Description("For the post-generation summary, how many tests are run")]
-        public int NumFinalTests  { get; set; }= 10;
+        public int NumFinalTests  { get; set; }= 100;
 
         [Description("Gives the player better hands, resulting in a more even filling in of the three grids")]
         public bool StackTheDeck { get; set; } = false;

@@ -4,7 +4,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Optimal Blackjack Strategy Finder Using a Genetic Algorithm"
         SizeToContent="Manual"
-        Height="700"
+        Height="725"
         Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="DarkGray"

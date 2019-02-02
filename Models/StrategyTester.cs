@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BlackjackStrategy.Models
 {
@@ -229,16 +231,16 @@ namespace BlackjackStrategy.Models
 
         public void GetStatistics(out double average, out double stdDev, out double coeffVariation)
         {
-            int numTests = testConditions.NumFinalTests;
-            int totalScore = 0;
-            List<int> scores = new List<int>();
-            for (int i = 0; i < numTests; i++)
+            int numTests = testConditions.NumFinalTests;            
+
+            ConcurrentBag<int> scores = new ConcurrentBag<int>();
+            Parallel.For(0, numTests, (i) =>
             {
                 int score = GetStrategyScore(testConditions.NumHandsToPlay);
-                totalScore += score;
                 scores.Add(score);
-            }
+            });
 
+            int totalScore = scores.ToArray().Sum();
             average = totalScore / numTests;
             stdDev = StandardDeviation(scores);
             coeffVariation = stdDev / average;

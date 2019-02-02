@@ -48,7 +48,7 @@ namespace BlackjackStrategy
         {
             var strategy = new HandCodedStrategy();
             strategy.LoadStandardStrategy();
-            DisplayStrategyGrids(strategy);
+            DisplayStrategyGrids(strategy, "Classic Baseline Blackjack Strategy");
             DisplayStatistics(strategy);
         }
 
@@ -63,7 +63,7 @@ namespace BlackjackStrategy
 
             // and then let 'er rip
             var strategy = engine.FindBestSolution();
-            DisplayStrategyGrids(strategy);
+            DisplayStrategyGrids(strategy, "Best from " + totalGenerations + " generations");
             DisplayStatistics(strategy);
 
             SetButtonsEnabled(true);
@@ -102,7 +102,7 @@ namespace BlackjackStrategy
                 "Gen " + progress.GenerationNumber.ToString().PadLeft(4) +
                 "  best: " + progress.BestFitnessThisGen.ToString("0").PadLeft(7) + bestSuffix +
                 "  avg: " + progress.AvgFitnessThisGen.ToString("0").PadLeft(7) + avgSuffix +
-                "  " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s";
+                "    " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s";
                 
             DisplayCurrentStatus(summary);
 
@@ -133,15 +133,15 @@ namespace BlackjackStrategy
             // keep track of how many gens we've searched
             totalGenerations = progress.GenerationNumber;
 
-            // then display the final results
-            DisplayStrategyGrids(bestThisGen);
+            // then display this generation's best 
+            DisplayStrategyGrids(bestThisGen, "Best from generation " + totalGenerations);
 
             // return true to keep going, false to halt the system
             bool keepRunning = true;
             return keepRunning;
         }
 
-        private void DisplayStrategyGrids(StrategyBase strategy)
+        private void DisplayStrategyGrids(StrategyBase strategy, string caption)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -149,7 +149,7 @@ namespace BlackjackStrategy
                 if (ProgramConfiguration.TestSettings.SaveImagePerGeneration)
                     imgFilename = "gen" + totalGenerations;
 
-                StrategyView.ShowPlayableHands(strategy, canvas, imgFilename);
+                StrategyView.ShowPlayableHands(strategy, canvas, imgFilename, caption);
             }),
             DispatcherPriority.Background);
         }
@@ -202,6 +202,5 @@ namespace BlackjackStrategy
             }),
             DispatcherPriority.Background);
         }
-
     }
 }

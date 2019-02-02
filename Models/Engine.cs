@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -140,36 +141,9 @@ namespace BlackjackStrategy.Models
                 if ((numElitesToAdd > 0) && (currentGenerationNumber != bestSolutionGenerationNumber))
                     nextGeneration.Add(BestSolution.Clone());
 
-                // now create a new generation using fitness scores for selection, and crossover and mutation
-                while (nextGeneration.Count < currentEngineParams.PopulationSize)
-                {
-                    // select parents
-                    Strategy parent1 = null, parent2 = null;
-                    switch (currentEngineParams.SelectionStyle)
-                    {
-                        case SelectionStyle.Tourney:
-                            parent1 = TournamentSelectParent();
-                            parent2 = TournamentSelectParent();
-                            break;
-
-                        case SelectionStyle.Roulette:
-                        case SelectionStyle.Ranked:
-                            parent1 = RouletteSelectParent();
-                            parent2 = RouletteSelectParent();
-                            break;
-                    }
-
-                    // cross them over to generate a new child
-                    Strategy child;
-                    child = parent1.CrossOverWith(parent2);
-
-                    // Mutation
-                    if (Randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
-                        child.Mutate(currentEngineParams.MutationImpact);
-
-                    // then add to the new generation 
-                    nextGeneration.Add(child);
-                }
+                // then do the selection, crossover and mutation to populate the rest of the next generation
+                var children = SelectCrossOverAndMutate(currentEngineParams.PopulationSize - nextGeneration.Count);
+                nextGeneration.AddRange(children);
 
                 // move to the next generation
                 currentGeneration = nextGeneration;
@@ -211,6 +185,42 @@ namespace BlackjackStrategy.Models
                     totalFitness += candidate.Fitness;
                 }
             }
+        }
+
+        private Strategy[] SelectCrossOverAndMutate(int numNeeded)
+        {
+            // multi-threading to fill in the remaining children for the next generation
+            ConcurrentBag<Strategy> results = new ConcurrentBag<Strategy>();
+            Parallel.For(0, numNeeded, (i) =>
+                {
+                    // select parents
+                    Strategy parent1 = null, parent2 = null;
+                    switch (currentEngineParams.SelectionStyle)
+                    {
+                        case SelectionStyle.Tourney:
+                            parent1 = TournamentSelectParent();
+                            parent2 = TournamentSelectParent();
+                            break;
+
+                        case SelectionStyle.Roulette:
+                        case SelectionStyle.Ranked:
+                            parent1 = RouletteSelectParent();
+                            parent2 = RouletteSelectParent();
+                            break;
+                    }
+
+                    // cross them over to generate a new child
+                    Strategy child;
+                    child = parent1.CrossOverWith(parent2);
+
+                    // Mutation
+                    if (Randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
+                        child.Mutate(currentEngineParams.MutationImpact);
+
+                    results.Add(child);
+                });
+
+            return results.ToArray();
         }
 
         // Selection Routines -----------------------------------------------

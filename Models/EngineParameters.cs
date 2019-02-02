@@ -9,7 +9,7 @@ namespace BlackjackStrategy.Models
     public sealed class EngineParameters
     {
         [Description("Number of candidates per generation")]
-        public int PopulationSize { get; set; } = 550;
+        public int PopulationSize { get; set; } = 700;
 
         [Description("If using Tourney Selection, how many to select")]
         public int TourneySize { get; set; } = 4;
@@ -27,7 +27,7 @@ namespace BlackjackStrategy.Models
         public SelectionStyle SelectionStyle { get; set; } = Models.SelectionStyle.Roulette;  
 
         [Description("From 0.0 to 1.0, percentage of the best scoring candidates moved to the next generation")]
-        public double ElitismRate { get; set; } = 0.20;
+        public double ElitismRate { get; set; } = 0.15;
 
         [Description("From 0.0 to 1.0, percentage of candidates that are mutated")]
         public double MutationRate { get; set; } = 0;

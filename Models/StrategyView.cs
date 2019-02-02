@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -7,7 +8,7 @@ namespace BlackjackStrategy.Models
 {
     class StrategyView
     {
-        public static void ShowPlayableHands(StrategyBase strategy, Canvas canvas, string savedImageName)
+        public static void ShowPlayableHands(StrategyBase strategy, Canvas canvas, string savedImageName, string displayText)
         {
             // clear the screen
             canvas.Children.Clear();
@@ -16,6 +17,8 @@ namespace BlackjackStrategy.Models
                     standColor = Color.FromRgb(252, 44, 44),
                     doubleColor = Colors.Yellow, 
                     splitColor = Colors.MediumPurple;
+
+            AddInformationalText(displayText, canvas);
 
             // display a grid for non-paired hands without an ace.  One column for each possible dealer upcard
             AddColorBox(Colors.White, "", 0, 0, canvas);
@@ -219,6 +222,23 @@ namespace BlackjackStrategy.Models
             canvas.Children.Add(box);
             Canvas.SetTop(box, startY + y * rowHeight);
             Canvas.SetLeft(box, startX + x * columnWidth);
+        }
+
+        private static void AddInformationalText(string message, Canvas canvas)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            var itemText = new TextBlock();
+            itemText.HorizontalAlignment = HorizontalAlignment.Left;
+            itemText.VerticalAlignment = VerticalAlignment.Center;
+            itemText.Inlines.Add(new Bold(new Run(message)));
+            itemText.FontSize = 20;
+
+            int spacing = (int)canvas.ActualWidth / 25;
+            int bottomY = (int)canvas.ActualHeight;
+            canvas.Children.Add(itemText);
+            Canvas.SetTop(itemText, bottomY - spacing * 1.5);
+            Canvas.SetLeft(itemText, spacing);
         }
 
         private static void SaveCanvasToPng(Canvas canvas, string savedImageName)
