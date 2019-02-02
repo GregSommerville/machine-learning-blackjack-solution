@@ -91,21 +91,27 @@ Luckily, there's a ridiculously simple way to efficiently use all of your proces
  
 Regardless of the number of items in the list or the number of processors on your machine, the code will efficiently run the code in a multi-threaded manner, and continue only when all of the threads are complete.
  
-During testing this code results in about 75% utilitization of 8 Xeon processors, which is much, much better than 95% of one processor.
- 
 One of the side effects of making this code multi-threaded is that all of the code relating to evaluating a candidate must be thread-safe, including any Singleton objects.  When making code thread-safe, pay attention that you don't accidentally introduce code that will slow your program down unintentionally, because sometimes it can be quite subtle.
  
 Early on in the development of this project, the code in the fitness function that simulated thousands of hands of Blackjack created a random (shuffled) deck of cards for each hand, just to ensure randomness.  And, since most casinos shuffle 4 decks together, that's what the code does too, which results in 208 cards.  
- 
-In a multi-threaded environment, a random number generator must be a singleton, meaning there's one that's shared by all of the threads.  That's due to the way that random numbers generators work.
+
+Random number generators used in a multi-threaded environment are often singletons,  meaning there's one that's shared by all of the threads.  That's due to the way that random numbers generators work.
  
 A random number generator uses a seed value, which is time-based, like the number of milliseconds the computer has been turned on.  Starting with that seed, subsequent calls will return a series of numbers that look random, but really aren't.  If you start with the same seed, you get the same sequence.  
  
 And that's a problem because if you create multiple random number generator objects in a loop, for example, several of them will have the same time-based initial seed value, and will result in the same sequence of "random" numbers.  That's a bug, because it can reduce the true randomness of the program a great deal, and that's vital to a genetic algorithm.
- 
-However, serializing access to a randomizer singletons is necessary but also slows down our multi-threading, which means we should try to minimize (or spread out) calls to that object.
- 
-This was definitely a problem in one of the earlier versions of the code.  By having each candidate create a random deck for each hand, the Randomizer object was getting swamped.  Changing the code to create one deck per candidate, and automatically shuffle when 20 or less cards were left proved to be a huge improvement.  One particular run dropped from 1 minute 10 seconds per generation to 10 seconds per generation.
+
+There are a couple of ways to solve this problem.  First, you can make the random object truly a singleton, and restrict access to it by using a C# lock statement.  The makes all access serialized for any random number need, which reduces performance.
+
+Luckily C# has a great feature where you can declare a variable that is static per thread.  By declaring the variable as `static` and also marking it with the `[ThreadStatic]` attribute, the .NET runtime allocates one static variable per thread.
+
+The initialization of this per-thread static is a little different than a normal static, so before each use, we check to see if the variable has been initialized.  If not, then we explicitly seed the random number generator with an int derived from the HashCode of a Guid.  We're always going to get a unique value from that, so it works well as a seed to a Random object.
+
+So multithreading really helps performance, but there are other things we can do to improve performance as well.  For example, when dealing with large populations, the hundreds or thousands of objects that will be generated each generation can quickly turn into a huge problem related to garbage collection.
+
+In the end, the easiest way to solve that is to look through the code and find objects being allocate inside a loop.  It's better to declare the variable outside of the loop, and then clear it in the loop, rather than reallocate it.  In a program like this one where you could be looping hundreds of thousands of times, this can result in a very significant performance boost.
+
+
  
 ## Results
  

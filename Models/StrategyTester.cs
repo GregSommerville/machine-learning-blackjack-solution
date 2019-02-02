@@ -34,16 +34,20 @@ namespace BlackjackStrategy.Models
         {
             int playerChips = 0;
             MultiDeck deck = new MultiDeck(testConditions.NumDecks);
+            Hand dealerHand = new Hand();
+            Hand playerHand = new Hand();
+            List<Hand> playerHands = new List<Hand>();
+            List<int> betAmountPerHand = new List<int>();
 
             for (int handNum = 0; handNum < numHandsToPlay; handNum++)
             {
-                Hand dealerHand = new Hand();
-                Hand playerHand = new Hand();
+                dealerHand.Cards.Clear();
+                playerHand.Cards.Clear();
 
                 dealerHand.AddCard(deck.DealCard());
                 dealerHand.AddCard(deck.DealCard());
-
                 playerHand.AddCard(deck.DealCard());
+
                 if (StackTheDeck)
                 {
                     // even out the hands dealt to the player so it's proportionate to the 
@@ -67,11 +71,11 @@ namespace BlackjackStrategy.Models
                 }
                 playerHand.AddCard(deck.DealCard());
 
-                List<Hand> playerHands = new List<Hand>();
+                playerHands.Clear();
                 playerHands.Add(playerHand);
 
                 // we need to track how much bet per hand, since you can double down after a split.
-                List<int> betAmountPerHand = new List<int>();
+                betAmountPerHand.Clear();
                 betAmountPerHand.Add(testConditions.BetSize);
                 playerChips -= testConditions.BetSize;
 

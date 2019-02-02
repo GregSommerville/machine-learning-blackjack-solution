@@ -29,6 +29,7 @@ namespace BlackjackStrategy.Models
             float bestFitnessScoreAllTime = float.MinValue;
             float bestAverageFitnessScore = float.MinValue;
             int bestSolutionGenerationNumber = 0, bestAverageFitnessGenerationNumber = 0;
+            List<Strategy> nextGeneration = new List<Strategy>();
 
             // elitism
             int numElitesToAdd = (int)(currentEngineParams.ElitismRate * currentEngineParams.PopulationSize);
@@ -130,7 +131,7 @@ namespace BlackjackStrategy.Models
                 AdjustFitnessScores();
 
                 // Start building the next generation
-                List<Strategy> nextGeneration = new List<Strategy>();
+                nextGeneration.Clear();
 
                 // Elitism
                 var theBest = currentGeneration.Take(numElitesToAdd);
@@ -146,7 +147,9 @@ namespace BlackjackStrategy.Models
                 nextGeneration.AddRange(children);
 
                 // move to the next generation
-                currentGeneration = nextGeneration;
+                currentGeneration.Clear();
+                currentGeneration.AddRange(nextGeneration);
+                
                 currentGenerationNumber++;
             }
 
