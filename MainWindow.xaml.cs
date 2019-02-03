@@ -102,7 +102,7 @@ namespace BlackjackStrategy
                 "Gen " + progress.GenerationNumber.ToString().PadLeft(4) +
                 "  best: " + progress.BestFitnessThisGen.ToString("0").PadLeft(7) + bestSuffix +
                 "  avg: " + progress.AvgFitnessThisGen.ToString("0").PadLeft(7) + avgSuffix +
-                "    " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s";
+                "    " + progress.TimeForGeneration.TotalSeconds.ToString("0") + "s"; 
                 
             DisplayCurrentStatus(summary);
 

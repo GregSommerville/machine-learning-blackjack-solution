@@ -76,6 +76,8 @@ The mutation rate is a number from 0 to 1 that controls whether or not we should
 Along with other configuration values used in the GA, population size has a significant impact on performance.  The smaller the population size, the faster the GA will execute.  On the other hand, if the size is too low the population may not have enough genetic diversity to find the ultimate solution.
  
 ## Performance Notes
+This program consumes a lot of processing power.  Running tests of hundreds of thousands of hands of Blackjack for hundreds or thousands of candidates consumes a lot of time.  It's really imperative to write the code so that it works as efficiently as possible.  If your CPU isn't consistently at or above 95% usage, there's still room for improvement.
+
 Multi-threading is a natural fit for genetic algorithms because we often want to perform the same action on each candidate.  The best example of this is when we calculate fitness scores.  This is often an operation that takes quite a bit of time.  In our case, we're dealing out 25,000 hands, and each hand has to be played until the end.  If we're single-threading that code, it's going to take a long time.  Multi-threading is really the way to go.
  
 Luckily, there's a ridiculously simple way to efficiently use all of your processors for an operation like this.  This code loops over all of the candidates in the currentGeneration list, calls the fitness function and sets the fitness property for each:
@@ -97,13 +99,13 @@ Early on in the development of this project, the code in the fitness function th
 
 Random number generators used in a multi-threaded environment are often singletons,  meaning there's one that's shared by all of the threads.  That's due to the way that random numbers generators work.
  
-A random number generator uses a seed value, which is time-based, like the number of milliseconds the computer has been turned on.  Starting with that seed, subsequent calls will return a series of numbers that look random, but really aren't.  If you start with the same seed, you get the same sequence.  
+A random number generator uses a seed value which is usually time-based, like the number of milliseconds the computer has been turned on.  Starting with that seed, subsequent calls will return a series of numbers that look random, but really aren't.  If you start with the same seed, you get the same sequence.  
  
 And that's a problem because if you create multiple random number generator objects in a loop, for example, several of them will have the same time-based initial seed value, and will result in the same sequence of "random" numbers.  That's a bug, because it can reduce the true randomness of the program a great deal, and that's vital to a genetic algorithm.
 
 There are a couple of ways to solve this problem.  First, you can make the random object truly a singleton, and restrict access to it by using a C# lock statement.  The makes all access serialized for any random number need, which reduces performance.
 
-Luckily C# has a great feature where you can declare a variable that is static per thread.  By declaring the variable as `static` and also marking it with the `[ThreadStatic]` attribute, the .NET runtime allocates one static variable per thread.
+Luckily C# has a great feature where you can declare a variable static per thread.  By declaring the variable as `static` and also marking it with the `[ThreadStatic]` attribute, the .NET runtime allocates one static variable per thread.
 
 The initialization of this per-thread static is a little different than a normal static, so before each use, we check to see if the variable has been initialized.  If not, then we explicitly seed the random number generator with an int derived from the HashCode of a Guid.  We're always going to get a unique value from that, so it works well as a seed to a Random object.
 
@@ -111,6 +113,11 @@ So multithreading really helps performance, but there are other things we can do
 
 In the end, the easiest way to solve that is to look through the code and find objects being allocate inside a loop.  It's better to declare the variable outside of the loop, and then clear it in the loop, rather than reallocate it.  In a program like this one where you could be looping hundreds of thousands of times, this can result in a very significant performance boost.
 
+In an early version of this code, a Deck object was created for each hand.  Since there are hundreds of candidate solutions running hundreds of thousands of trial hands, this was a huge inefficiency.  The code was changed to allocate one static deck per thread, which was shuffled as needed.
+
+Beyond the cards in the deck, another object type that was repeatedly created and destroyed were the candidate strategies.  To mitigate this problem, a StrategyPool class was created that handled allocation and deallocation.  This meant that strategy objects were reused, rather than dynamically creating one when needed.  The pool class has to be thread-safe, so it does serialize access to its methods via a C# lock statement, but overall using the pool approach produced a good performance increase.
+
+Finally, a subtle form of object allocation is conversion.  In an early version of the code, the `RankValueHigh` and `RankValueLow` used `Convert.ToInt32(rankEnum)`.  There must be something in this code that degrades over time - perhaps only when used in a multithreaded environment - because the profiler identified this as a function that had large amounts of thread contention waiting - and the problem got much, much work as the generations passed.  By doing the conversion by hand (i.e., doing a `return 8` when the enum value was `Eight`, the program performance increased threefold (3x).
 
  
 ## Results

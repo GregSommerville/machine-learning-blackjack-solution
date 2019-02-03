@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlackjackStrategy.Models
 {
-    class StrategyFactory
+    class StrategyPool
     {
-        private Queue<Strategy> availablePool, inUsePool;
+        private object threadLock = new object();
+        private Queue<Strategy> availablePool;
+        private List<Strategy> inUseList;
 
-        public StrategyFactory(int populationSize)
+        public StrategyPool(int populationSize)
         {
-            // set up the queues
+            // a queue to get the next available, a list to track which are used
             availablePool = new Queue<Strategy>(populationSize);
-            inUsePool = new Queue<Strategy>(populationSize);
+            inUseList = new List<Strategy>(populationSize);
 
             // and populate 
             for (int i = 0; i < populationSize; i++)
@@ -23,34 +23,52 @@ namespace BlackjackStrategy.Models
 
         public Strategy GetEmpty()
         {
-            var result = availablePool.Dequeue();
-            inUsePool.Enqueue(result);
+            lock (threadLock)
+            {
+                Debug.Assert(availablePool.Any(), "Available queue empty");
 
-            return result;
+                var result = availablePool.Dequeue();
+                inUseList.Add(result);
+
+                return result;
+            }
         }
 
         public Strategy GetRandomized()
         {
-            var result = availablePool.Dequeue();
-            inUsePool.Enqueue(result);
+            lock (threadLock)
+            {
+                Debug.Assert(availablePool.Any(), "Available queue empty");
 
-            result.Randomize();
-            return result;
+                var result = availablePool.Dequeue();
+                inUseList.Add(result);
+
+                result.Randomize();
+                return result;
+            }
         }
 
         public Strategy CopyOf(Strategy strategy)
         {
-            var result = availablePool.Dequeue();
-            inUsePool.Enqueue(result);
+            lock (threadLock)
+            {
+                Debug.Assert(availablePool.Any(), "Available queue empty");
 
-            result.DeepCopy(strategy);
-            return result;
+                var result = availablePool.Dequeue();
+                inUseList.Add(result);
+
+                result.DeepCopy(strategy);
+                return result;
+            }
         }
 
-        public void Reset()
+        public void Release(Strategy strategy)
         {
-            while (inUsePool.Count > 0)
-                availablePool.Enqueue(inUsePool.Dequeue());
+            var found = inUseList.Find(s => s == strategy);
+            Debug.Assert(found != null, "Error releasing strategy");
+
+            inUseList.Remove(found);
+            availablePool.Enqueue(found);
         }
     }
 }

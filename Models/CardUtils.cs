@@ -75,9 +75,31 @@ namespace BlackjackStrategy.Models
                     case Ranks.Ten:
                         return 10;
 
-                    default:
-                        return Convert.ToInt32(Rank);
+                    case Ranks.Nine:
+                        return 9;
+
+                    case Ranks.Eight:
+                        return 8;
+
+                    case Ranks.Seven:
+                        return 7;
+
+                    case Ranks.Six:
+                        return 6;
+
+                    case Ranks.Five:
+                        return 5;
+
+                    case Ranks.Four:
+                        return 4;
+
+                    case Ranks.Three:
+                        return 3;
+
+                    case Ranks.Two:
+                        return 2;
                 }
+                throw new InvalidOperationException();
             }
         }
 
@@ -96,9 +118,31 @@ namespace BlackjackStrategy.Models
                     case Ranks.Ten:
                         return 10;
 
-                    default:
-                        return Convert.ToInt32(Rank);
+                    case Ranks.Nine:
+                        return 9;
+
+                    case Ranks.Eight:
+                        return 8;
+
+                    case Ranks.Seven:
+                        return 7;
+
+                    case Ranks.Six:
+                        return 6;
+
+                    case Ranks.Five:
+                        return 5;
+
+                    case Ranks.Four:
+                        return 4;
+
+                    case Ranks.Three:
+                        return 3;
+
+                    case Ranks.Two:
+                        return 2;
                 }
+                throw new InvalidOperationException();
             }
         }
 
@@ -205,17 +249,27 @@ namespace BlackjackStrategy.Models
 
     //=======================================================================
 
-    class MultiDeck
+    class Deck
     {
-        public List<Card> Cards { get; set; }
-        private int currentCard = 0;
+        // By using thread-specific static variables for a deck, we avoid the performance hit 
+        // of repeatedly creating and destroying a deck object
+        [ThreadStatic] private static int currentCard = 0;
+        [ThreadStatic] private static List<Card> Cards;
+        [ThreadStatic] private static int numDecks;
 
-        public MultiDeck(int numDecks)
+        public static void SetNumDecks(int numDecksToUse)
         {
-            CreateRandomDeck(numDecks);
+            numDecks = numDecksToUse;
         }
 
-        private void CreateRandomDeck(int numDecks)
+        // ThreadStatic variables are not consistently instantiated, so we check before each call
+        private static void CreateIfNeeded()
+        {
+            if (Cards == null)
+                CreateRandomDeck();
+        }
+
+        private static void CreateRandomDeck()
         {
             Cards = new List<Card>(52 * numDecks);
 
@@ -230,14 +284,17 @@ namespace BlackjackStrategy.Models
             Shuffle();
         }
 
-        public Card DealCard()
+        public static Card DealCard()
         {
+            CreateIfNeeded();
             ShuffleIfNeeded();
             return Cards[currentCard++];
         }
 
-        public void ForceNextCardToBe(Card.Ranks rank)
+        public static void ForceNextCardToBe(Card.Ranks rank)
         {
+            CreateIfNeeded();
+
             // to compensate for the fact that pairs and soft hands don't happen that often,
             // we may wish to force a card to be dealt next
 
@@ -267,8 +324,10 @@ namespace BlackjackStrategy.Models
             Cards[currentCard] = temp;
         }
 
-        public void EnsureNextCardIsnt(Card.Ranks rank)
+        public static void EnsureNextCardIsnt(Card.Ranks rank)
         {
+            CreateIfNeeded();
+
             // similar to ForceNextCardToBe, this is used for stacking the deck
             while (Cards[currentCard].Rank == rank)
             {
@@ -277,20 +336,18 @@ namespace BlackjackStrategy.Models
             }
         }
 
-        public int CardsRemaining {
+        public static int CardsRemaining {
             get
             {
+                CreateIfNeeded();
                 return Cards.Count - currentCard;
             }
         }
 
-        public override string ToString()
+        public static void Shuffle()
         {
-            return CardsRemaining + " remaining";
-        }
+            CreateIfNeeded();
 
-        public void Shuffle()
-        {
             // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
             int start = Cards.Count - 1;
             for (int i = start; i > 1; i--)
@@ -304,7 +361,7 @@ namespace BlackjackStrategy.Models
             currentCard = 0;
         }
 
-        public void ShuffleIfNeeded()
+        public static void ShuffleIfNeeded()
         {
             if (CardsRemaining < 20)
                 Shuffle();
