@@ -15,10 +15,10 @@ namespace BlackjackStrategy.Models
 
         public void Randomize()
         {
-            foreach (var upcardRank in Card.ListOfRanks)
+            for (int upcardRank = 0; upcardRank <= Card.HighestUpcardRank; upcardRank++)
             {
                 // randomize pairs
-                foreach (var pairRank in Card.ListOfRanks)
+                for (int pairRank = 0; pairRank <= Card.HighestUpcardRank; pairRank++)
                     SetActionForPair(upcardRank, pairRank, GetRandomAction(true));
 
                 // and soft hands
@@ -43,15 +43,15 @@ namespace BlackjackStrategy.Models
             // pairs
             for (int i = 0; i < NumPairMutations; i++)
             {
-                var upcardRank = GetRandomRankForMutation();
-                var randomPairRank = GetRandomRankForMutation();
+                var upcardRank = GetRandomRankIndex();
+                var randomPairRank = GetRandomRankIndex();
                 SetActionForPair(upcardRank, randomPairRank, GetRandomAction(true));
             }
 
             // soft hands
             for (int i = 0; i < NumSoftMutations; i++)
             {
-                var upcardRank = GetRandomRankForMutation();
+                var upcardRank = GetRandomRankIndex();
                 var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
                 SetActionForSoftHand(upcardRank, randomRemainder, GetRandomAction(false));
             }
@@ -59,22 +59,15 @@ namespace BlackjackStrategy.Models
             // hard hands
             for (int i = 0; i < NumHardMutations; i++)
             {
-                var upcardRank = GetRandomRankForMutation();
+                var upcardRank = GetRandomRankIndex();
                 var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
                 SetActionForHardHand(upcardRank, hardTotal, GetRandomAction(false));
             }
         }
 
-        private Card.Ranks GetRandomRankForMutation()
+        private int GetRandomRankIndex()
         {
-            Card.Ranks rank;
-            do
-                rank = (Card.Ranks) Randomizer.IntBetween((int)Card.Ranks.Two, (int)Card.Ranks.Ace);
-            while (rank == Card.Ranks.King || 
-                   rank == Card.Ranks.Queen || 
-                   rank == Card.Ranks.Jack);
-
-            return rank;
+            return Randomizer.IntLessThan(Card.HighestUpcardRank);
         }
 
         private ActionToTake GetRandomAction(bool includeSplit)
@@ -118,10 +111,10 @@ namespace BlackjackStrategy.Models
                 percentageChanceOfMine = 1 - (myScore / (myScore + theirScore));
             }
 
-            foreach (var upcardRank in Card.ListOfRanks)
+            for (int upcardRank = 0; upcardRank <= Card.HighestUpcardRank; upcardRank++)
             {
                 // populate the pairs
-                foreach (var pairRank in Card.ListOfRanks)
+                for (int pairRank = 0; pairRank <= Card.HighestUpcardRank; pairRank++)
                 {
                     bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForPair(upcardRank, pairRank, 

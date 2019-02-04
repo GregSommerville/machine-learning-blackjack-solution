@@ -11,6 +11,8 @@ namespace BlackjackStrategy.Models
         public enum Suits { Hearts, Spades, Clubs, Diamonds };
         public enum Ranks { Two = 2, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace };
 
+        public static int HighestUpcardRank = 9;    
+
         // this card
         public Ranks Rank { get; set; }
         public Suits Suit { get; set; }
@@ -26,7 +28,7 @@ namespace BlackjackStrategy.Models
 
         public Card(int rankValue, Suits suit)
         {
-            Rank = (Ranks) rankValue;
+            Rank = (Ranks)rankValue;
             Suit = suit;
         }
 

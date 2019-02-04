@@ -46,29 +46,21 @@ namespace BlackjackStrategy.Models
         {
             var actions = GetActionsFromString(actionString);
             for (int i = 0; i < actions.Count; i++)
-                SetActionForHardHand(GetUpcardRank(i), total, actions[i]);
+                SetActionForHardHand(i, total, actions[i]);
         }
 
         private void LoadSoftHolding(int softRemainder, string actionString)
         {
             var actions = GetActionsFromString(actionString);
             for (int i = 0; i < actions.Count; i++)
-                SetActionForSoftHand(GetUpcardRank(i), softRemainder, actions[i]);
+                SetActionForSoftHand(i, softRemainder, actions[i]);
         }
 
         private void LoadPairHolding(Card.Ranks pairRank, string actionString)
         {
             var actions = GetActionsFromString(actionString);
             for (int i = 0; i < actions.Count; i++)
-                SetActionForPair(GetUpcardRank(i), pairRank, actions[i]);
-        }
-
-        private Card.Ranks GetUpcardRank(int offset)
-        {
-            // our grid dealer upcards go from 2 on the left end to A on the right end 
-            if (offset < 9)
-                return Card.Ranks.Two + offset;
-            return Card.Ranks.Ace;
+                SetActionForPair(i, IndexFromRank(pairRank), actions[i]);
         }
 
         private List<ActionToTake> GetActionsFromString(string s)

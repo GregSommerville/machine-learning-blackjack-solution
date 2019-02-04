@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace BlackjackStrategy.Models
 {
+    
     // enums and other public constants
     public enum ActionToTake { Stand, Hit, Double, Split };
 
@@ -10,8 +12,7 @@ namespace BlackjackStrategy.Models
         public static int NumActionsNoSplit = 3;
         public static int NumActionsWithSplit = 4;
 
-        public static int HighestUpcardRank = (int)Card.Ranks.Ace;
-        public static int HighestPairRank = (int)Card.Ranks.Ace;
+        public static int HighestUpcardIndex = 9;
 
         // soft remainders go from 2 to 9, since A-10 is blackjack, and A-1 isn't possible (would be A-A)
         public static int LowestSoftHandRemainder = 2;
@@ -28,9 +29,9 @@ namespace BlackjackStrategy.Models
         public StrategyBase()
         {
             // everything initialized to "Stand"
-            pairsStrategy = new ActionToTake[HighestUpcardRank + 1, HighestPairRank + 1];
-            softStrategy = new ActionToTake[HighestUpcardRank + 1, HighestSoftHandRemainder + 1];
-            hardStrategy = new ActionToTake[HighestUpcardRank + 1, HighestHardHandValue + 1];
+            pairsStrategy = new ActionToTake[HighestUpcardIndex + 1, HighestUpcardIndex + 1];
+            softStrategy = new ActionToTake[HighestUpcardIndex + 1, HighestSoftHandRemainder + 1];
+            hardStrategy = new ActionToTake[HighestUpcardIndex + 1, HighestHardHandValue + 1];
         }
 
         public void DeepCopy(StrategyBase copyFrom)
@@ -42,31 +43,31 @@ namespace BlackjackStrategy.Models
         }
 
         // getters and setters for the three tables, used during crossover
-        public ActionToTake GetActionForPair(Card.Ranks upcardRank, Card.Ranks pairRank)
+        public ActionToTake GetActionForPair(int upcardRank, int pairRank)
         {
-            return pairsStrategy[(int)upcardRank, (int)pairRank];
+            return pairsStrategy[upcardRank, pairRank];
         }
-        public void SetActionForPair(Card.Ranks upcardRank, Card.Ranks pairRank, ActionToTake action)
+        public void SetActionForPair(int upcardRank, int pairRank, ActionToTake action)
         {
-            pairsStrategy[(int)upcardRank, (int)pairRank] = action;
-        }
-
-        public ActionToTake GetActionForSoftHand(Card.Ranks upcardRank, int softRemainder)
-        {
-            return softStrategy[(int)upcardRank, softRemainder];
-        }
-        public void SetActionForSoftHand(Card.Ranks upcardRank, int softRemainder, ActionToTake action)
-        {
-            softStrategy[(int)upcardRank, softRemainder] = action;
+            pairsStrategy[upcardRank, pairRank] = action;
         }
 
-        public ActionToTake GetActionForHardHand(Card.Ranks upcardRank, int hardTotal)
+        public ActionToTake GetActionForSoftHand(int upcardRank, int softRemainder)
         {
-            return hardStrategy[(int)upcardRank, hardTotal];
+            return softStrategy[upcardRank, softRemainder];
         }
-        public void SetActionForHardHand(Card.Ranks upcardRank, int hardTotal, ActionToTake action)
+        public void SetActionForSoftHand(int upcardRank, int softRemainder, ActionToTake action)
         {
-            hardStrategy[(int)upcardRank, hardTotal] = action;
+            softStrategy[upcardRank, softRemainder] = action;
+        }
+
+        public ActionToTake GetActionForHardHand(int upcardRank, int hardTotal)
+        {
+            return hardStrategy[upcardRank, hardTotal];
+        }
+        public void SetActionForHardHand(int upcardRank, int hardTotal, ActionToTake action)
+        {
+            hardStrategy[upcardRank, hardTotal] = action;
         }
 
 
@@ -75,12 +76,12 @@ namespace BlackjackStrategy.Models
         {
             if (hand.HandValue() >= 21) return ActionToTake.Stand;
 
-            var upcardRank = CollapsedRank(dealerUpcard.Rank);
+            var upcardIndex = IndexFromRank(dealerUpcard.Rank);
 
             if (hand.IsPair())
             {
-                var pairRank = CollapsedRank(hand.Cards[0].Rank);
-                return pairsStrategy[upcardRank, pairRank];
+                var pairIndex = IndexFromRank(hand.Cards[0].Rank);
+                return pairsStrategy[upcardIndex, pairIndex];
             }
 
             if (hand.HasSoftAce())
@@ -92,23 +93,51 @@ namespace BlackjackStrategy.Models
                     .Sum(c => c.RankValueHigh) +
                     (howManyAces - 1);
 
-                return softStrategy[upcardRank, total];
+                return softStrategy[upcardIndex, total];
             }
 
-            return hardStrategy[upcardRank, hand.HandValue()];
+            return hardStrategy[upcardIndex, hand.HandValue()];
         }
 
-        private int CollapsedRank(Card.Ranks rank)
+        public int IndexFromRank(Card.Ranks rank)
         {
             // we collapse certain ranks together because they're the same value
             switch (rank)
             {
-                case Card.Ranks.Jack:
-                case Card.Ranks.Queen:
+                case Card.Ranks.Ace:
+                    return 9;
+
                 case Card.Ranks.King:
-                    return (int)Card.Ranks.Ten;
+                case Card.Ranks.Queen:
+                case Card.Ranks.Jack:
+                case Card.Ranks.Ten:
+                    return 8;
+
+                case Card.Ranks.Nine:
+                    return 7;
+
+                case Card.Ranks.Eight:
+                    return 6;
+
+                case Card.Ranks.Seven:
+                    return 5;
+
+                case Card.Ranks.Six:
+                    return 4;
+
+                case Card.Ranks.Five:
+                    return 3;
+
+                case Card.Ranks.Four:
+                    return 2;
+
+                case Card.Ranks.Three:
+                    return 1;
+
+                case Card.Ranks.Two:
+                    return 0;
             }
-            return (int)rank;
+            throw new InvalidOperationException();
         }
     }
 }
