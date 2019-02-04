@@ -5,6 +5,8 @@ namespace BlackjackStrategy.Models
     // encapsulates one complete strategy to play Blackjack
     class Strategy : StrategyBase
     {
+        private Randomizer randomizer = new Randomizer();
+
         public Strategy Clone()
         {
             var result = new Strategy();
@@ -52,7 +54,7 @@ namespace BlackjackStrategy.Models
             for (int i = 0; i < NumSoftMutations; i++)
             {
                 var upcardRank = GetRandomRankIndex();
-                var randomRemainder = Randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
+                var randomRemainder = randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
                 SetActionForSoftHand(upcardRank, randomRemainder, GetRandomAction(false));
             }
 
@@ -60,21 +62,21 @@ namespace BlackjackStrategy.Models
             for (int i = 0; i < NumHardMutations; i++)
             {
                 var upcardRank = GetRandomRankIndex();
-                var hardTotal = Randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
+                var hardTotal = randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
                 SetActionForHardHand(upcardRank, hardTotal, GetRandomAction(false));
             }
         }
 
         private int GetRandomRankIndex()
         {
-            return Randomizer.IntLessThan(Card.HighestUpcardRank);
+            return randomizer.IntLessThan(Card.HighestUpcardRank);
         }
 
         private ActionToTake GetRandomAction(bool includeSplit)
         {
             return includeSplit ? 
-                (ActionToTake)Randomizer.IntLessThan(NumActionsWithSplit) :
-                (ActionToTake)Randomizer.IntLessThan(NumActionsNoSplit);
+                (ActionToTake)randomizer.IntLessThan(NumActionsWithSplit) :
+                (ActionToTake)randomizer.IntLessThan(NumActionsNoSplit);
         }
 
         public void CrossOverWith(Strategy otherParent, Strategy child)
@@ -116,7 +118,7 @@ namespace BlackjackStrategy.Models
                 // populate the pairs
                 for (int pairRank = 0; pairRank <= Card.HighestUpcardRank; pairRank++)
                 {
-                    bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
+                    bool useMyAction = randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForPair(upcardRank, pairRank, 
                         useMyAction ?
                             this.GetActionForPair(upcardRank, pairRank) :
@@ -126,7 +128,7 @@ namespace BlackjackStrategy.Models
                 // populate the soft hands
                 for (int softRemainder = LowestSoftHandRemainder; softRemainder <= HighestSoftHandRemainder; softRemainder++)
                 {
-                    bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
+                    bool useMyAction = randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForSoftHand(upcardRank, softRemainder, 
                         useMyAction ?
                         this.GetActionForSoftHand(upcardRank, softRemainder) :
@@ -136,7 +138,7 @@ namespace BlackjackStrategy.Models
                 // populate the hard hands
                 for (int hardValue = LowestHardHandValue; hardValue <= HighestHardHandValue; hardValue++)
                 {
-                    bool useMyAction = Randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
+                    bool useMyAction = randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForHardHand(upcardRank, hardValue, 
                         useMyAction ?
                         this.GetActionForHardHand(upcardRank, hardValue) :

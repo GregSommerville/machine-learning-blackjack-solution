@@ -5,13 +5,13 @@ namespace BlackjackStrategy.Models
 {
     public class Randomizer
     {
-        [ThreadStatic] private static Random randomizer;
+        private Random randomizer;
 
-        // Using a [ThreadStatic] attribute means we need to check for initialization
-        private static void CreateIfNeeded()
+        public Randomizer()
         {
-            if (randomizer == null)
-                randomizer = new Random(Guid.NewGuid().GetHashCode());
+            // this is a pretty good way to get a random-ish seed value, so each thread
+            // is different, even if created at roughly the same moment
+            randomizer = new Random(Guid.NewGuid().GetHashCode());
         }
 
         /// <summary>
@@ -20,9 +20,8 @@ namespace BlackjackStrategy.Models
         /// <param name="lower"></param>
         /// <param name="upper"></param>
         /// <returns></returns>
-        public static int IntBetween(int lower, int upper)
+        public int IntBetween(int lower, int upper)
         {
-            CreateIfNeeded();
             return randomizer.Next(lower, upper);
         }
 
@@ -31,9 +30,8 @@ namespace BlackjackStrategy.Models
         /// </summary>
         /// <param name="upper"></param>
         /// <returns></returns>
-        public static int IntLessThan(int upper)
+        public int IntLessThan(int upper)
         {
-            CreateIfNeeded();
             return randomizer.Next(upper);
         }
 
@@ -41,9 +39,8 @@ namespace BlackjackStrategy.Models
         /// Returns a double >= 0 and less than 1.0.  Safe for multi-threading.
         /// </summary>
         /// <returns></returns>
-        public static double GetDoubleFromZeroToOne()
+        public double GetDoubleFromZeroToOne()
         {
-            CreateIfNeeded();
             return randomizer.NextDouble();
         }
 
@@ -51,9 +48,8 @@ namespace BlackjackStrategy.Models
         /// Returns a float >= 0 and less than 1.0.  Safe for multi-threading.
         /// </summary>
         /// <returns></returns>
-        public static float GetFloatFromZeroToOne()
+        public float GetFloatFromZeroToOne()
         {
-            CreateIfNeeded();
             return (float)randomizer.NextDouble();
         }
     }

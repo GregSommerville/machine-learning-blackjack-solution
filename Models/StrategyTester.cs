@@ -33,7 +33,9 @@ namespace BlackjackStrategy.Models
         public int GetStrategyScore(int numHandsToPlay)
         {
             int playerChips = 0;
-            Deck.SetNumDecks(testConditions.NumDecks);
+            var deck = new Deck(testConditions.NumDecks);
+            var randomizer = new Randomizer();
+
             Hand dealerHand = new Hand();
             Hand playerHand = new Hand();
             List<Hand> playerHands = new List<Hand>();
@@ -44,32 +46,32 @@ namespace BlackjackStrategy.Models
                 dealerHand.Cards.Clear();
                 playerHand.Cards.Clear();
 
-                dealerHand.AddCard(Deck.DealCard());
-                dealerHand.AddCard(Deck.DealCard());
-                playerHand.AddCard(Deck.DealCard());
+                dealerHand.AddCard(deck.DealCard());
+                dealerHand.AddCard(deck.DealCard());
+                playerHand.AddCard(deck.DealCard());
 
                 if (StackTheDeck)
                 {
                     // even out the hands dealt to the player so it's proportionate to the 
                     // number of cells in the three grids
-                    var rand = Randomizer.GetFloatFromZeroToOne();
+                    var rand = randomizer.GetFloatFromZeroToOne();
                     if (rand < 0.33F)
                     {
                         // deal a pair
-                        Deck.ForceNextCardToBe(playerHand.Cards[0].Rank);
+                        deck.ForceNextCardToBe(playerHand.Cards[0].Rank);
                     }
                     if (rand >= 0.33F && rand < 0.66F)
                     {
                         // deal a soft hand
                         if (playerHand.Cards[0].Rank != Card.Ranks.Ace)
-                            Deck.ForceNextCardToBe(Card.Ranks.Ace);
+                            deck.ForceNextCardToBe(Card.Ranks.Ace);
                         else
-                            Deck.EnsureNextCardIsnt(Card.Ranks.Ace);    // avoid a pair of Aces
+                            deck.EnsureNextCardIsnt(Card.Ranks.Ace);    // avoid a pair of Aces
                     }
                     // yes, our normal deal for hard hands may result in a pair or a hard hand, but 
                     // we don't care since we're just trying to even out the proportion of those type of hands
                 }
-                playerHand.AddCard(Deck.DealCard());
+                playerHand.AddCard(deck.DealCard());
 
                 playerHands.Clear();
                 playerHands.Add(playerHand);
@@ -130,7 +132,7 @@ namespace BlackjackStrategy.Models
                         switch (action)
                         {
                             case ActionToTake.Hit:
-                                playerHand.AddCard(Deck.DealCard());
+                                playerHand.AddCard(deck.DealCard());
 
                                 // if we're at 21, we automatically stand
                                 if (playerHand.HandValue() == 21)
@@ -153,7 +155,7 @@ namespace BlackjackStrategy.Models
                                 playerChips -= testConditions.BetSize;
                                 betAmountPerHand[handIndex] += testConditions.BetSize;
 
-                                playerHand.AddCard(Deck.DealCard());
+                                playerHand.AddCard(deck.DealCard());
                                 if (playerHand.HandValue() > 21)
                                 {
                                     betAmountPerHand[handIndex] = 0;
@@ -167,8 +169,8 @@ namespace BlackjackStrategy.Models
                                 // add the new hand to our collection
                                 var newHand = new Hand();
                                 newHand.AddCard(playerHand.Cards[1]);
-                                playerHand.Cards[1] = Deck.DealCard();
-                                newHand.AddCard(Deck.DealCard());
+                                playerHand.Cards[1] = deck.DealCard();
+                                newHand.AddCard(deck.DealCard());
                                 playerHands.Add(newHand);
 
                                 // our extra bet
@@ -189,7 +191,7 @@ namespace BlackjackStrategy.Models
                     // draw until holding 17 or busting
                     while (dealerHand.HandValue() < 17)
                     {
-                        dealerHand.AddCard(Deck.DealCard());
+                        dealerHand.AddCard(deck.DealCard());
                         if (dealerHand.HandValue() > 21)
                         {
                             // payoff each hand that is still valid - busts and blackjacks have 0 for betAmountPerHand

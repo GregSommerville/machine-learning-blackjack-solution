@@ -17,7 +17,7 @@ namespace BlackjackStrategy.Models
         private EngineParameters currentEngineParams = new EngineParameters();  // with defaults
         private List<Strategy> currentGeneration = new List<Strategy>();
         private StrategyPool pool;
-        private float totalFitness = 0;
+        private float totalFitness = 0;      
 
         public Engine(EngineParameters userParams)
         {
@@ -202,6 +202,8 @@ namespace BlackjackStrategy.Models
             ConcurrentBag<Strategy> results = new ConcurrentBag<Strategy>();
             Parallel.For(0, numNeeded, (i) =>
                 {
+                    var randomizer = new Randomizer();  // thread-specific version
+
                     // select parents
                     Strategy parent1 = null, parent2 = null;
                     switch (currentEngineParams.SelectionStyle)
@@ -223,7 +225,7 @@ namespace BlackjackStrategy.Models
                     parent1.CrossOverWith(parent2, child);
 
                     // Mutation
-                    if (Randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
+                    if (randomizer.GetFloatFromZeroToOne() < currentEngineParams.MutationRate)
                         child.Mutate(currentEngineParams.MutationImpact);
 
                     results.Add(child);
@@ -236,12 +238,14 @@ namespace BlackjackStrategy.Models
 
         private Strategy TournamentSelectParent()
         {
+            var randomizer = new Randomizer();  // thread-specific version
+
             Strategy result = null;
             float bestFitness = float.MinValue;
 
             for (int i = 0; i < currentEngineParams.TourneySize; i++)
             {
-                int index = Randomizer.IntLessThan(currentEngineParams.PopulationSize);
+                int index = randomizer.IntLessThan(currentEngineParams.PopulationSize);
                 var randomCandidate = currentGeneration[index];
                 var fitness = randomCandidate.Fitness;
 
@@ -257,9 +261,11 @@ namespace BlackjackStrategy.Models
 
         private Strategy RouletteSelectParent()
         {
+            var randomizer = new Randomizer();  // thread-specific version
+
             // using Roulette Wheel Selection, we grab a possibility proportionate to it's fitness compared to
             // the total fitnesses of all possibilities
-            double randomValue = Randomizer.GetDoubleFromZeroToOne() * totalFitness;
+            double randomValue = randomizer.GetDoubleFromZeroToOne() * totalFitness;
             for (int i = 0; i < currentEngineParams.PopulationSize; i++)
             {
                 randomValue -= currentGeneration[i].Fitness;

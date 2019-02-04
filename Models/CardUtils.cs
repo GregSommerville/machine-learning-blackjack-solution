@@ -253,25 +253,18 @@ namespace BlackjackStrategy.Models
 
     class Deck
     {
-        // By using thread-specific static variables for a deck, we avoid the performance hit 
-        // of repeatedly creating and destroying a deck object
-        [ThreadStatic] private static int currentCard = 0;
-        [ThreadStatic] private static List<Card> Cards;
-        [ThreadStatic] private static int numDecks;
+        private int currentCard = 0;
+        private List<Card> Cards;
+        private int numDecks;
 
-        public static void SetNumDecks(int numDecksToUse)
+        public Deck(int numDecksToUse)
         {
             numDecks = numDecksToUse;
+            CreateRandomDeck();
+
         }
 
-        // ThreadStatic variables are not consistently instantiated, so we check before each call
-        private static void CreateIfNeeded()
-        {
-            if (Cards == null)
-                CreateRandomDeck();
-        }
-
-        private static void CreateRandomDeck()
+        private void CreateRandomDeck()
         {
             Cards = new List<Card>(52 * numDecks);
 
@@ -286,17 +279,14 @@ namespace BlackjackStrategy.Models
             Shuffle();
         }
 
-        public static Card DealCard()
+        public Card DealCard()
         {
-            CreateIfNeeded();
             ShuffleIfNeeded();
             return Cards[currentCard++];
         }
 
-        public static void ForceNextCardToBe(Card.Ranks rank)
+        public void ForceNextCardToBe(Card.Ranks rank)
         {
-            CreateIfNeeded();
-
             // to compensate for the fact that pairs and soft hands don't happen that often,
             // we may wish to force a card to be dealt next
 
@@ -326,10 +316,8 @@ namespace BlackjackStrategy.Models
             Cards[currentCard] = temp;
         }
 
-        public static void EnsureNextCardIsnt(Card.Ranks rank)
+        public void EnsureNextCardIsnt(Card.Ranks rank)
         {
-            CreateIfNeeded();
-
             // similar to ForceNextCardToBe, this is used for stacking the deck
             while (Cards[currentCard].Rank == rank)
             {
@@ -338,23 +326,21 @@ namespace BlackjackStrategy.Models
             }
         }
 
-        public static int CardsRemaining {
+        public int CardsRemaining {
             get
             {
-                CreateIfNeeded();
                 return Cards.Count - currentCard;
             }
         }
 
-        public static void Shuffle()
+        public void Shuffle()
         {
-            CreateIfNeeded();
-
             // then shuffle using Fisher-Yates: one pass through, swapping the current card with a random one below it
             int start = Cards.Count - 1;
+            var randomizer = new Randomizer();
             for (int i = start; i > 1; i--)
             {
-                int swapWith = Randomizer.IntLessThan(i);
+                int swapWith = randomizer.IntLessThan(i);
 
                 Card hold = Cards[i];
                 Cards[i] = Cards[swapWith];
@@ -363,7 +349,7 @@ namespace BlackjackStrategy.Models
             currentCard = 0;
         }
 
-        public static void ShuffleIfNeeded()
+        public void ShuffleIfNeeded()
         {
             if (CardsRemaining < 20)
                 Shuffle();
