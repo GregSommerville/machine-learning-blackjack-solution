@@ -17,10 +17,10 @@ namespace BlackjackStrategy.Models
 
         public void Randomize()
         {
-            for (int upcardRank = 0; upcardRank <= Card.HighestUpcardRank; upcardRank++)
+            for (int upcardRank = 0; upcardRank <= Card.HighestRankIndex; upcardRank++)
             {
                 // randomize pairs
-                for (int pairRank = 0; pairRank <= Card.HighestUpcardRank; pairRank++)
+                for (int pairRank = 0; pairRank <= Card.HighestRankIndex; pairRank++)
                     SetActionForPair(upcardRank, pairRank, GetRandomAction(true));
 
                 // and soft hands
@@ -69,7 +69,7 @@ namespace BlackjackStrategy.Models
 
         private int GetRandomRankIndex()
         {
-            return randomizer.IntLessThan(Card.HighestUpcardRank);
+            return randomizer.IntLessThan(Card.HighestRankIndex);
         }
 
         private ActionToTake GetRandomAction(bool includeSplit)
@@ -113,10 +113,10 @@ namespace BlackjackStrategy.Models
                 percentageChanceOfMine = 1 - (myScore / (myScore + theirScore));
             }
 
-            for (int upcardRank = 0; upcardRank <= Card.HighestUpcardRank; upcardRank++)
+            for (int upcardRank = 0; upcardRank <= Card.HighestRankIndex; upcardRank++)
             {
                 // populate the pairs
-                for (int pairRank = 0; pairRank <= Card.HighestUpcardRank; pairRank++)
+                for (int pairRank = 0; pairRank <= Card.HighestRankIndex; pairRank++)
                 {
                     bool useMyAction = randomizer.GetFloatFromZeroToOne() < percentageChanceOfMine;
                     child.SetActionForPair(upcardRank, pairRank, 

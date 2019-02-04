@@ -1,3 +1,4 @@
 ﻿==========================
 TO DO
 ==========================
+- Engine.cs: extract best-of detection code to separate function

@@ -59,8 +59,8 @@ namespace BlackjackStrategy.Models
                         }
                     }
 
-                    playerHand.AddCard(new Card(firstCardRank, Card.Suits.Diamonds));
-                    playerHand.AddCard(new Card(secondCardRank, Card.Suits.Hearts));
+                    playerHand.AddCard(new Card((Card.Ranks)firstCardRank, Card.Suits.Diamonds));
+                    playerHand.AddCard(new Card((Card.Ranks)secondCardRank, Card.Suits.Hearts));
 
                     // get strategy and display
                     var action = strategy.GetActionForHand(playerHand, dealerUpcard);

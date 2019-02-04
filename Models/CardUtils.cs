@@ -10,8 +10,7 @@ namespace BlackjackStrategy.Models
         // the card attribute enums
         public enum Suits { Hearts, Spades, Clubs, Diamonds };
         public enum Ranks { Two = 2, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace };
-
-        public static int HighestUpcardRank = 9;    
+        public static int HighestRankIndex = 9;    
 
         // this card
         public Ranks Rank { get; set; }
@@ -26,20 +25,15 @@ namespace BlackjackStrategy.Models
             Suit = suit;
         }
 
-        public Card(int rankValue, Suits suit)
-        {
-            Rank = (Ranks)rankValue;
-            Suit = suit;
-        }
-
+        // helper properties, for when it's easier to use a list vs. enumerating
         public static List<Ranks> ListOfRanks
         {
             get
             {
                 if (rankList != null) return rankList;
 
-                var ranks = Enum.GetValues(typeof(Ranks));
                 var result = new List<Ranks>();
+                var ranks = Enum.GetValues(typeof(Ranks));
                 foreach (var rank in ranks)
                     result.Add((Ranks)rank);
                 rankList = result;
@@ -77,31 +71,9 @@ namespace BlackjackStrategy.Models
                     case Ranks.Ten:
                         return 10;
 
-                    case Ranks.Nine:
-                        return 9;
-
-                    case Ranks.Eight:
-                        return 8;
-
-                    case Ranks.Seven:
-                        return 7;
-
-                    case Ranks.Six:
-                        return 6;
-
-                    case Ranks.Five:
-                        return 5;
-
-                    case Ranks.Four:
-                        return 4;
-
-                    case Ranks.Three:
-                        return 3;
-
-                    case Ranks.Two:
-                        return 2;
+                    default:
+                        return (int)Rank;
                 }
-                throw new InvalidOperationException();
             }
         }
 
@@ -120,38 +92,16 @@ namespace BlackjackStrategy.Models
                     case Ranks.Ten:
                         return 10;
 
-                    case Ranks.Nine:
-                        return 9;
-
-                    case Ranks.Eight:
-                        return 8;
-
-                    case Ranks.Seven:
-                        return 7;
-
-                    case Ranks.Six:
-                        return 6;
-
-                    case Ranks.Five:
-                        return 5;
-
-                    case Ranks.Four:
-                        return 4;
-
-                    case Ranks.Three:
-                        return 3;
-
-                    case Ranks.Two:
-                        return 2;
+                    default:
+                        return (int)Rank;
                 }
-                throw new InvalidOperationException();
             }
         }
 
         public static string RankText(Ranks rank)
         {
             var rankChars = "  23456789TJQKA".ToCharArray();
-            return rankChars[Convert.ToInt32(rank)].ToString();
+            return rankChars[(int)rank].ToString();
         }
 
         public override string ToString()
@@ -261,7 +211,6 @@ namespace BlackjackStrategy.Models
         {
             numDecks = numDecksToUse;
             CreateRandomDeck();
-
         }
 
         private void CreateRandomDeck()
@@ -287,7 +236,8 @@ namespace BlackjackStrategy.Models
 
         public void ForceNextCardToBe(Card.Ranks rank)
         {
-            // to compensate for the fact that pairs and soft hands don't happen that often,
+            // this function used when stacking the deck
+            // it compensates for the fact that pairs and soft hands don't happen that often,
             // we may wish to force a card to be dealt next
 
             // first, look for the rank in the remaining cards
