@@ -61,12 +61,10 @@ namespace BlackjackStrategy.Models
                 stopwatch.Restart();
 
                 // for each candidate, find and store the fitness score
-                // multithread the fitness evaluation 
                 Parallel.ForEach(currentGeneration, (candidate) =>
                 {
                     // calc the fitness by calling the user-supplied function via the delegate   
-                    float fitness = FitnessFunction(candidate);
-                    candidate.Fitness = fitness;
+                    candidate.Fitness = FitnessFunction(candidate);
                 });
 
                 // now check if we have a new best
@@ -128,12 +126,8 @@ namespace BlackjackStrategy.Models
                         break;
                 }
 
-                // we may need to sort the current generation by fitness, depending on SelectionStyle
-                if (needToSortByFitness)
-                    currentGeneration = currentGeneration.OrderByDescending(c => c.Fitness).ToList();
-
                 // depending on the SelectionStyle, we may need to adjust all candidate's fitness scores
-                AdjustFitnessScores();
+                AdjustFitnessScores(needToSortByFitness);
 
                 // Start building the next generation
                 nextGeneration.Clear();
@@ -163,8 +157,12 @@ namespace BlackjackStrategy.Models
             return BestSolution;
         }
 
-        private void AdjustFitnessScores()
+        private void AdjustFitnessScores(bool needToSortByFitness)
         {
+            // we may need to sort the current generation by fitness, depending on SelectionStyle
+            if (needToSortByFitness)
+                currentGeneration = currentGeneration.OrderByDescending(c => c.Fitness).ToList();
+
             // if doing ranked, adjust the fitness scores to be the ranking, with 0 = worst, (N-1) = best.
             // this style is good if the fitness scores for different candidates in the same generation would vary widely, especially
             // in early generations.  It smooths out those differences, which allows more genetic diversity
