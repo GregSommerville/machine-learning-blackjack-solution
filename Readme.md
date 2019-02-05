@@ -31,7 +31,7 @@ Notice that the upcard ranks don't include Jack, Queen or King.  That's because 
 ## A Word About This "Optimal" Strategy
 Before we go any further, it needs to be stated that this problem of finding an optimal Blackjack strategy has already been solved.  
 
-Back in the 1960s, a mathemetician named [Edward O. Thorp](https://en.wikipedia.org/wiki/Edward_O._Thorp) authored a book called *Beat the Dealer*, which included charts showing the optimal "Basic" strategy.  That strategy looks like this:
+Back in the 1960s, a mathematician named [Edward O. Thorp](https://en.wikipedia.org/wiki/Edward_O._Thorp) authored a book called *Beat the Dealer*, which included charts showing the optimal "Basic" strategy.  That strategy looks like this:
 
 ![optimal blackjack strategy](/images/optimal.png)
 
