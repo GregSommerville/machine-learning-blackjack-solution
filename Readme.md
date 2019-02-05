@@ -1,17 +1,21 @@
 # machine-learning-blackjack-solution
  
 ## Introduction
-A genetic algorithm is a type of artificial intelligence programming that evolves a solution to a problem using concepts like evolution.  It uses populations of (initially random) candidate solutions, and breeds them generation after generation until an optimal solution is found.  Genetic algorithms are particularly well-suited for combinatorial problems, where there are huge numbers of potential solutions to a problem.
+A genetic algorithm is a type of artificial intelligence programming that uses concepts like evolution to  solve complex problems.  
+
+It uses populations of (initially random) candidate solutions, selects some (looking for higher quality candidates, but keeping things random at the same time) and breeds them generation after generation until an optimal solution is found.  
+
+Genetic algorithms are particularly well-suited for combinatorial problems, where there are huge numbers of potential solutions to a problem.
 
 This project is a demonstration of using a genetic algorithm to find an optimal strategy for playing the casino game Blackjack.
 
-The program is a Windows WPF application written in C# that allows you to play with different settings like population size, selection style and mutation rate.  Each generation's best solution is displayed, so you can watch the program literally evolve a solution.
+The source code is for a Windows WPF application written in C# that allows you to play with different settings like population size, selection style and mutation rate.  Each generation's best solution is displayed, so you can watch the program literally evolve a solution.
 
 ![blackjack strategy tester screenshot](images/screenshot1.png)
 
  
 ## Genetic Algorithms
-A genetic algorithm is a type of artificial intelligence programming that evolves a solution to a problem using concepts from biology like evolution.  The basic idea is to create a population of candidate solutions, where each candidate gets a fitness score based on a testing function.  Candidates with high fitness scores are combined using a method based on the concept of genetic crossover, and you can also include processing similar to genetic mutations to offspring of selected candidates.  Once a new generation is created, the previous generation is discarded and the process starts over again with the new generation.  Ultimately a final solution is found by choosing the best candidate over all of the generations.
+A genetic algorithm is a type of AI (artificial intelligence) programming that evolves a solution to a problem using concepts from biology like evolution.  The basic idea is to create a population of candidate solutions, where each candidate gets a fitness score based on a testing function.  Candidates with high fitness scores are combined using a method based on the concept of genetic crossover, and you can also include processing similar to genetic mutations to offspring of selected candidates.  Once a new generation is created, the previous generation is discarded and the process starts over again with the new generation.  Ultimately a final solution is found by choosing the best candidate over all of the generations.
  
 Genetic algorithms (GAs) are extremely helpful when trying to find an optimal solution from a very large set of possible solutions.  For example, a Blackjack strategy is typically represented by three tables - one for hard hands, one for soft hands, and one for pairs.  Each cell of those three tables contains the value "Stand", "Hit", "Double-down", or (for pairs only) "Split".  
  
