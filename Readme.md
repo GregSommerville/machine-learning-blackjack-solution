@@ -1,7 +1,14 @@
-# blackjack-solved-with-ai: A Genetic Algorithm Finds a Solution to Blackjack
+# machine-learning-blackjack-solution
  
 ## Introduction
-This repo contains C# code that implements a genetic algorithm that finds an optimal strategy for the casino game known as Blackjack or 21.  The program is a Windows WPF application that allows you to play with different settings like population size, selection style and mutation rate.  Each generation's best solution is displayed, so you can watch the program literally evolve a solution.
+A genetic algorithm is a type of artificial intelligence programming that evolves a solution to a problem using concepts like evolution.  It uses populations of (initially random) candidate solutions, and breeds them generation after generation until an optimal solution is found.  Genetic algorithms are particularly well-suited for combinatorial problems, where there are huge numbers of potential solutions to a problem.
+
+This project is a demonstration of using a genetic algorithm to find an optimal strategy for playing the casino game Blackjack.
+
+The program is a Windows WPF application written in C# that allows you to play with different settings like population size, selection style and mutation rate.  Each generation's best solution is displayed, so you can watch the program literally evolve a solution.
+
+![blackjack strategy tester screenshot](images/screenshot1.png)
+
  
 ## Genetic Algorithms
 A genetic algorithm is a type of artificial intelligence programming that evolves a solution to a problem using concepts from biology like evolution.  The basic idea is to create a population of candidate solutions, where each candidate gets a fitness score based on a testing function.  Candidates with high fitness scores are combined using a method based on the concept of genetic crossover, and you can also include processing similar to genetic mutations to offspring of selected candidates.  Once a new generation is created, the previous generation is discarded and the process starts over again with the new generation.  Ultimately a final solution is found by choosing the best candidate over all of the generations.
@@ -24,7 +31,7 @@ Because of these rules, certain effective strategies emerge.  One common strateg
 Another common strategy is to split a pair of Aces, since Aces are so powerful (due to the fact that count as 11 or 1, you can often Hit a hand with a soft Ace with no risk of busting).  Likewise, splitting a pair of 8s is a good idea because with a hard total of 16, it's likely you will bust if you take a Hit (since so many cards count as 10).
  
 These strategies are often represented by three tables.  As was stated earlier, the columns of these tables refer to the dealer upcard, and the rows are for various player holdings like a pair of 6s, or a hard 12, etc.  Here's an example strategy table from Wikipedia:
-![Wikipedia.org Blackjack Strategy image](/images/wikistrategy.jpg)
+![Wikipedia.org Blackjack Strategy image](/images/optimal.png)
  
 The GA program in this repo will find a strategy that is optimal or near-optimal, without any pre-programmed knowledge of Blackjack strategy.
  
