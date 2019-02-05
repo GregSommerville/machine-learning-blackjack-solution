@@ -27,6 +27,9 @@ The columns along the tops of the three tables are for the dealer upcard.  When 
 
 Notice that the upcard ranks don't include Jack, Queen or King.  That's because those cards all count 10, so we group them and the Ten together and simplify the tables.
 
+To use the tables, first, determine if you have a pair, soft hand, or hard hand.  Then look in the appropriate table, with the correct dealer upcard column.  The cell in the table will be "H" when the correct strategy is to hit, "S" when the correct strategy is to stand, "D" for double-down, and (in the pairs table only) "P" for split.
+
+<br/>
 
 ## A Word About This "Optimal" Strategy
 Before we go any further, it needs to be stated that this problem of finding an optimal Blackjack strategy has already been solved.  
@@ -35,19 +38,27 @@ Back in the 1960s, a mathematician named [Edward O. Thorp](https://en.wikipedia.
 
 ![optimal blackjack strategy](/images/optimal.png)
 
-So we're solving a problem that has already been solved, but that's actually good.  That means we can compare our results to the known best solution.
+So we're solving a problem that has already been solved, but that's actually good.  That means we can compare our results to the known best solution.  For example, if our result strategy tells us to do anything but stand when holding a pair of Tens, Jacks, Queens or Kings, we know there's a problem.
 
-There's one other thing to get out of the way before we go any further, and that's *nondeterministic code*.  That means that if we run the same code twice in a row, we're likely to get two different results.  That's something that happens with genetic algorithms.  There's no guarantee you'll find the absolute optimal solution, but it is assured that you will find *an* optimal or near-optimal solution.  It's something that isn't typical when writing code, so it takes some adjustment.
+There's one other thing to get out of the way before we go any further, and that's the idea of *nondeterministic code*.  That means that if we run the same code twice in a row, we're likely to get two different results.  
+
+That's something that happens with genetic algorithms due to their inherent randomness.  There's no guarantee you'll find the absolute optimal solution, but it is assured that you will find *an* optimal or near-optimal solution.  It's something that isn't typical when writing code, so it takes some adjustment for most programmers.
+
+<br/>
 
 ## Genetic Algorithms
 Now let's talk about the details of a genetic algorithm.
 
 ### Fitness Scores
-First of all, we need a way to evaluate candidates so we can compare them to each other.  That means a numeric *fitness score*, which in this case is quite simple: you simulate a fixed number of hands following the strategy, and then count the number of chips you have at the end.
+First of all, we need a way to evaluate candidates so we can compare them to each other.  That means a numeric *fitness score*, which in this case is quite simple: you simulate playing a certain number of hands using the strategy, and then count the number of chips you have at the end.
 
 The big question is, how many hands should we test with?  The challenge of trying to test a strategy is that due to the innate randomness of Blackjack, you could use the same strategy ten times and get ten completely different results.
 
-Obviously, the more hands you play, the more the randomness gets smoothed out, and the quality of the underlying strategy starts to emerge.  After some testing and analysis, it seems like a minimum of 100,000 hands per test is needed.  There's still variance even at that number, but in order to cut the variance in half, you'd need to bump the number of hands to 500,000.
+Obviously, the more hands you play, the more the randomness gets smoothed out, and the quality of the underlying strategy starts to emerge.  If you doubt this, just think about flipping a coin.  If you only flip it five times, there's certainly a possibility that it'll come up heads all five times (in fact, that happens just over 3% of the time).  However, if you flip it 500 times, there's no way it's going to end up all heads - the odds of it happening are 0.5<sup>500</sup>, which works out to be roughly once every 3 x 10<sup>150</sup> times you try it.
+
+After some testing and analysis, it was determined that a minimum of 100,000 hands per test is needed for a reasonable level of accuracy.  There's still variance even at that number, but in order to cut the variance in half, you'd need to bump the number of hands to 500,000.
+
+One reason this accuracy is important is that in the later generations, the differences between candidates are very small.  Evolution has caused the main parts of the strategy to converge on a particular approach, and towards the end all it's doing is refining the minor details.  In those cases it's important to accurately determine the difference between two similar candidates.
 
 
 ### Representation
@@ -62,7 +73,9 @@ By the way, since there are 160 cells in the hard hands table, and 80 cells in t
 4<sup>100</sup> x 3<sup>80</sup> x 3<sup>160</sup> = 5 x 10<sup>174</sup> possible Blackjack strategies
 
 That's a big number, which is obviously impossible to search using brute force.  Genetic algorithms (GAs) are extremely helpful when trying to find an optimal solution from a very large set of possible solutions like this.
-  
+
+<br/>
+
 ## Blackjack Rules and Strategies
 The [rules of Blackjack](https://en.wikipedia.org/wiki/Blackjack) are fairly simple.  The dealer and the player both are dealt two cards.  The player sees both of their cards (they are usually dealt face up), and one of the dealer's cards is dealt face up.  
 
@@ -79,6 +92,8 @@ Because of these rules, certain effective strategies emerge.  One common strateg
 Another common strategy is to split a pair of Aces, since Aces are so powerful (due to the fact that count as 11 or 1, you can often Hit a hand with a soft Ace with no risk of busting).  Likewise, splitting a pair of 8s is a good idea because with a hard total of 16, it's likely you will bust if you take a Hit (since so many cards count as 10).
 
 As a human being, all it takes is a little knowledge about the rules in order to construct a strategy.  The GA program doesn't have that advantage, and operates completely without any pre-programmed knowledge of Blackjack.  It simply uses the relative fitness scores and the mechanism of evolution to find the solution.
+
+<br/>
 
 ## GA Settings
 There are many variables or settings for a GA.  You can adjust population size, how parent candidates are selected, how the resulting children may be mutated, and several other items.  The following sections describe some of these settings:
@@ -136,7 +151,9 @@ There are two settings for mutation.  `MutationRate` controls what percentage of
   
 ### Population Size
 Population size has a significant impact on performance.  The smaller the population size, the faster the GA will execute.  On the other hand, if the size is too low the population may not have enough genetic diversity to find the ultimate solution.  During testing, it looks like 700 to 1000 is a good balance between speed and correctness.
- 
+
+<br/>
+
 ## Performance Notes
 This program consumes a lot of processing power.  Running tests of hundreds of thousands of hands of Blackjack for hundreds or thousands of candidates consumes a lot of time.  It's really imperative to write the code so that it works as efficiently as possible.  If your CPU isn't consistently at or above 95% usage, there's still room for improvement.
 
@@ -179,7 +196,8 @@ Finally, a subtle form of object allocation is conversion.  In an early version 
 
 Perhaps the compiler was boxing the enum value before passing it to `Convert.ToInt32()`, because the profiler identified this as a function that had large amounts of thread contention waiting - and the problem got much, much worse as the generations passed.  By rewriting the conversion to use a simple cast, the program performance increased threefold (3x).
 
- 
+ <br/>
+
 ## Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
  
