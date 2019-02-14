@@ -3,15 +3,15 @@
 ## Introduction
 A *genetic algorithm* is a type of artificial intelligence programming that uses ideas from evolution to solve complex problems.
 
-It works by creating a population of (initially random) candidate solutions, then repeatedly selecting pairs of candidates and combining their solutions using a process similar to genetic crossover.  
-
-Sometimes candidate solutions even go through mutation, just to introduce new possibilities into the population.  
+It works by creating a population of (initially random) candidate solutions, then repeatedly selecting pairs of candidates and combining their solutions using a process similar to genetic crossover.  Sometimes candidate solutions even go through mutation, just to introduce new possibilities into the population.  
 
 After a large number of generations, the best solution found up to that point is often the optimal, best solution possible.
 
 Genetic algorithms are particularly well-suited for combinatorial problems, where there are huge numbers of potential solutions to a problem.  The evolutionary process they go through is, in essence, a search through a huge solution space.  A solution space so large that you simply could never use a brute force approach.
 
 This project is a demonstration of using a genetic algorithm to find an optimal strategy for playing the casino game [Blackjack](https://en.wikipedia.org/wiki/Blackjack).
+
+Please see [this article](https://towardsdatascience.com/winning-blackjack-using-machine-learning-681d924f197c) for a story about how this program was used, and what the results were.  The article describes some of the available settings, and shows how different values for those settings affect the final result.
 
 The source code is for a Windows application written in C# that allows you to play with different settings like population size, selection style and mutation rate.  Each generation's best solution is displayed, so you can watch the program literally evolve a solution.
 
@@ -182,7 +182,7 @@ There are a couple of ways to solve this problem.  First, you can make the rando
 
 Another approach is to make the variable static per thread.  By declaring the variable as `static` and also marking it with the `[ThreadStatic]` attribute, the .NET runtime allocates one static variable per thread.  That eliminates the locking/serialization, but also has performance issues.
 
-The approach used in this application is to use a non-default seed value.  In this case we call `Guid.NewGuid().GetHashCode()`, which generates a new, unique GUID, then gets an integer value that will be unique, or really close to it, depending on how `GetHashCode` is implemented.
+The approach used in this application is to use a non-default seed value.  In this case we call `Guid.NewGuid().GetHashCode()`, which generates a new, unique GUID, then gets an integer hashcode value that should be unique, depending on how `GetHashCode` is implemented.
 
 While multithreading really helps performance, there are also other things we can do to improve performance.  For example, when dealing with large populations, the hundreds or thousands of objects that will be generated each generation can quickly turn into a huge problem related to garbage collection.
 
@@ -190,9 +190,9 @@ In the end, the easiest way to solve that is to look through the code and find o
 
 For example, in an early version of this code, a Deck object was created for each hand.  Since there are hundreds of candidate solutions running hundreds of thousands of trial hands, this was a huge inefficiency.  The code was changed to allocate one deck per test sequence.  The deck was shuffled as needed, so it never needs to be reallocated.
 
-Beyond the cards in the deck, another object type that was repeatedly created and destroyed were the candidate strategies.  To mitigate this problem, a StrategyPool class was created that handleds allocation and deallocation.  This means that strategy objects are reused, rather than dynamically created when needed.  The pool class has to be thread-safe, so it does serialize access to its methods via a C# lock statement, but overall using the pool approach produced a good performance increase.
+Beyond the cards in the deck, another object type that was repeatedly created and destroyed were the candidate strategies.  To mitigate this problem, a StrategyPool class was created that handles allocation and deallocation.  This means that strategy objects are reused, rather than dynamically created when needed.  The pool class has to be thread-safe, so it does serialize access to its methods via a C# lock statement, but overall using the pool approach produced a good performance increase.
 
-Finally, a subtle form of object allocation is conversion.  In an early version of the code, a utility card function used `Convert.ToInt32(rankEnum)`.  Obviously, the easiest way to convert from an enum to an int is simply to cast it, like `(int)rankEnum`.  But many programmers don't know whether to use that approach, `int.Parse()`, `int.TryParse()`, or `Convert.ToInt32()`, since they can all be used.
+Finally, a subtle form of object allocation is conversion.  In an early version of the code, a utility card function used `Convert.ToInt32(rankEnum)`.  Obviously, the easiest way to convert from an enum to an int is simply to cast it, like `(int)rankEnum`.  But it's hard to know exactly what the difference is between that approach, `int.Parse()`, `int.TryParse()`, or `Convert.ToInt32()`, since they can all be used and are roughly equivalent.
 
 Perhaps the compiler was boxing the enum value before passing it to `Convert.ToInt32()`, because the profiler identified this as a function that had large amounts of thread contention waiting - and the problem got much, much worse as the generations passed.  By rewriting the conversion to use a simple cast, the program performance increased threefold (3x).
 
