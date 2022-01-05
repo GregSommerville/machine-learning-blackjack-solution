@@ -85,7 +85,7 @@ namespace BlackjackStrategy.Models
                 if (playerHand.HandValue() == 21)
                 {
                     // if the dealer also has 21, then it's a tie
-                    if (dealerHand.HandValue() != 21)
+                    if (dealerHand.HandValue() == 21)
                     {
                         playerChips += betAmountPerHand[0]; // return the bet
                     }
