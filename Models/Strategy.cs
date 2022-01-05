@@ -38,12 +38,12 @@ namespace BlackjackStrategy.Models
             // impact is the % of cells that should be mutated
 
             // randomly set cells in each of the arrays
-            int NumPairMutations = (int) (100F * impact);     // 10 possible holdings x 10 upcards
-            int NumSoftMutations = (int) (80F * impact);     // 8 possible holdings
-            int NumHardMutations = (int) (160F * impact);     // 16 possible holdings
+            int numPairMutations = (int) (100F * impact);     // 10 possible holdings x 10 upcards
+            int numSoftMutations = (int) (80F * impact);     // 8 possible holdings
+            int numHardMutations = (int) (160F * impact);     // 16 possible holdings
 
             // pairs
-            for (int i = 0; i < NumPairMutations; i++)
+            for (int i = 0; i < numPairMutations; i++)
             {
                 var upcardRank = GetRandomRankIndex();
                 var randomPairRank = GetRandomRankIndex();
@@ -51,7 +51,7 @@ namespace BlackjackStrategy.Models
             }
 
             // soft hands
-            for (int i = 0; i < NumSoftMutations; i++)
+            for (int i = 0; i < numSoftMutations; i++)
             {
                 var upcardRank = GetRandomRankIndex();
                 var randomRemainder = randomizer.IntBetween(LowestSoftHandRemainder, HighestSoftHandRemainder);
@@ -59,7 +59,7 @@ namespace BlackjackStrategy.Models
             }
 
             // hard hands
-            for (int i = 0; i < NumHardMutations; i++)
+            for (int i = 0; i < numHardMutations; i++)
             {
                 var upcardRank = GetRandomRankIndex();
                 var hardTotal = randomizer.IntBetween(LowestHardHandValue, HighestHardHandValue);
